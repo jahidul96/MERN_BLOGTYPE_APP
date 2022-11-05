@@ -14,7 +14,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    profilePic: String,
+    profileImg: String,
+    followers: Array,
+    newNotification: {
+      type: Boolean,
+      default: false,
+    },
+    notifications: Array,
     categorie: {
       type: String,
       required: true,

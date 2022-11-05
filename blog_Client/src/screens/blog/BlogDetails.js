@@ -26,8 +26,7 @@ import {
 
 import { Tag } from "../../component/Tag";
 import axios from "axios";
-
-const domainPath = "http://192.168.1.4:4000/blog";
+import { APIURL } from "../../api";
 
 const BlogDetails = ({ navigation, route }) => {
   const { data } = route.params;
@@ -50,7 +49,7 @@ const BlogDetails = ({ navigation, route }) => {
 
   const getThisBlogPost = async () => {
     try {
-      const data = await axios.get(`${domainPath}/${_id}`);
+      const data = await axios.get(`${APIURL}/blog/${_id}`);
       setSingleBlog(data.data.blog);
       // console.log("single blog data", data.data);
     } catch (error) {

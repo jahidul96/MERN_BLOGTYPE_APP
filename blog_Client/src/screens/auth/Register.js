@@ -18,6 +18,10 @@ import {
 } from "../../component/Reuse/Reuse";
 import Picker from "../../component/Picker";
 import COLOR from "../../COLOR/COLOR";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { APIURL } from "../../api";
+import { AuthContext } from "../../context/Context";
 
 const img =
   "https://cdn2.iconfinder.com/data/icons/aami-web-internet/64/aami4-02-512.png";
@@ -40,6 +44,7 @@ const Register = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { setUser } = useContext(AuthContext);
 
   const fileds = [username, email, password];
 
@@ -56,7 +61,7 @@ const Register = ({ navigation }) => {
     setPick(!pick);
   };
 
-  const submit = () => {
+  const submit = async () => {
     const allField = [...fileds, categorie];
     const required = allField.every(Boolean);
     if (!required) {
@@ -65,7 +70,8 @@ const Register = ({ navigation }) => {
     setLoading(true);
 
     let userInfo = {
-      email,
+      email: email.toLowerCase(),
+      password,
       username,
       categorie,
       profileImg: "",
@@ -74,7 +80,26 @@ const Register = ({ navigation }) => {
       notifications: [],
     };
 
-    console.log();
+    try {
+      const response = await axios.post(`${APIURL}/register`, userInfo);
+
+      const value = response.data.user;
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("user", jsonValue);
+
+      setUser(value);
+
+      setLoading(false);
+      setTimeout(() => {
+        navigation.navigate("Home");
+      }, 1500);
+      Alert.alert("USER CREATED SUCCESFULLY!");
+
+      // console.log(value);
+    } catch (error) {
+      console.log(error.message);
+      setLoading(false);
+    }
   };
 
   return (

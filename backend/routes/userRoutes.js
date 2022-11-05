@@ -1,17 +1,25 @@
 const router = require("express").Router();
 const User = require("../models/userSchema");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 router.post("/register", async (req, res, next) => {
-  const { username, email, password, profilePic, categorie } = req.body;
+  const {
+    username,
+    email,
+    password,
+    profileImg,
+    categorie,
+    followers,
+    newNotification,
+    notifications,
+  } = req.body;
   const hasedPassword = await bcrypt.hash(password, 10);
 
   try {
     const alredyUser = await User.findOne({ email: email });
     if (alredyUser) {
-      return next({
-        message: "User already Exits",
+      return res.status(403).json({
+        message: "User Already Active!!!",
       });
     }
     const user = new User({
@@ -19,25 +27,17 @@ router.post("/register", async (req, res, next) => {
       username,
       password: hasedPassword,
       categorie,
-      profilePic,
+      profileImg,
+      followers,
+      newNotification,
+      notifications,
     });
     await user.save();
 
-    const token = jwt.sign(
-      {
-        email,
-        username,
-        categorie,
-        profilePic,
-        userId: user._id,
-      },
-      process.env.JWT_SECRET
-    );
     user.password = undefined;
     res.status(201).json({
       status: "created",
       user,
-      token,
     });
   } catch (error) {
     next(error);
@@ -62,21 +62,9 @@ router.post("/login", async (req, res, next) => {
         message: "Wrong Credential's!",
       });
     } else {
-      const token = jwt.sign(
-        {
-          email: isThere.email,
-          username: isThere.username,
-          categorie: isThere.categorie,
-          profilePic: isThere.categorie,
-          userId: isThere._id,
-        },
-        process.env.JWT_SECRET
-      );
-
       isThere.password = undefined;
       res.status(200).json({
         status: "succefull",
-        token,
         user: isThere,
       });
     }

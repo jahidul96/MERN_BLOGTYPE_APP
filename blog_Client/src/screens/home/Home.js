@@ -15,29 +15,45 @@ import COLOR from "../../COLOR/COLOR";
 import ProfileComponent from "../../component/ProfileComponent";
 import Feather from "react-native-vector-icons/Feather";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { LoadingComp } from "../../component/Reuse/Reuse";
-
-const domainPath = "http://192.168.1.4:4000/blog";
+import { APIURL } from "../../api";
+import {
+  getUserFromAsync,
+  removeValueFromAsync,
+} from "../../../utils/LocalStorage";
+import { AuthContext } from "../../context/Context";
 
 const Home = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [allBlogs, setAllBlogs] = useState([]);
   const [myCategorieBlogs, setMyCategorieBlogs] = useState([]);
+  const { setUser } = useContext(AuthContext);
 
   const loggedUser = {};
   const myblogerProfile = {};
 
+  // getUserFromAsync()
+  //   .then((data) => console.log("i am from asyncStorage!!", data))
+  //   .catch((err) => console.log(err.message));
+
   const goToAccount = () => {
     navigation.navigate("Account");
   };
+
   const goToNotification = () => {
-    navigation.navigate("Notification");
+    // navigation.navigate("Notification");
+    removeValueFromAsync();
+    setUser(null);
+    setTimeout(() => {
+      navigation.navigate("Register");
+    }, 1500);
   };
 
   const getBlogs = async () => {
     try {
-      const blogData = await axios.get(domainPath);
+      const blogData = await axios.get(`${APIURL}/blog`);
 
       // console.log(blogData.data.blog);
       setAllBlogs(blogData.data.blog);

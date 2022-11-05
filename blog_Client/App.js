@@ -15,6 +15,8 @@ import Notification from "./src/screens/notification/Notification";
 
 import Profile from "./src/screens/profile/Profile";
 import BlogDetails from "./src/screens/blog/BlogDetails";
+import { getUserFromAsync } from "./utils/LocalStorage";
+import { AuthContext } from "./src/context/Context";
 
 // import PostBlog from "./src/screens/blog/PostBlog";
 
@@ -26,6 +28,7 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
   const [appIsReady, setAppIsReady] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     async function prepare() {
@@ -43,6 +46,14 @@ const App = () => {
       }
     }
     prepare();
+
+    getUserFromAsync()
+      .then((data) => {
+        setUser(data);
+      })
+      .catch((err) => {
+        setUser(null);
+      });
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
@@ -55,19 +66,27 @@ const App = () => {
     return null;
   }
   return (
-    <NavigationContainer onLayout={onLayoutRootView}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Account" component={Account} />
-        <Stack.Screen name="Favorites" component={Favorites} />
-        <Stack.Screen name="BlogDetails" component={BlogDetails} />
-        <Stack.Screen name="Notification" component={Notification} />
-        <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="ResetPassword" component={ResetPassword} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthContext.Provider value={{ user, setUser }}>
+      <NavigationContainer onLayout={onLayoutRootView}>
+        {user ? (
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Account" component={Account} />
+            <Stack.Screen name="Favorites" component={Favorites} />
+            <Stack.Screen name="BlogDetails" component={BlogDetails} />
+            <Stack.Screen name="Notification" component={Notification} />
+            <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
+          </Stack.Navigator>
+        ) : (
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Register" component={Register} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
+          </Stack.Navigator>
+        )}
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 };
 export default App;
