@@ -11,15 +11,31 @@ import { useNavigation } from "@react-navigation/native";
 import COLOR from "../COLOR/COLOR";
 import ProfileComponent from "./ProfileComponent";
 import Entypo from "react-native-vector-icons/Entypo";
+import axios from "axios";
+
+const domainPath = "http://192.168.1.4:4000/blog";
 
 export const SingleBlog = ({ blog, favorite, onPress }) => {
   const navigation = useNavigation();
-  const { id, value } = blog;
-  const { postedBy } = value;
+
+  const loggedUser = {};
+  // const { postedBy } = value;
+
+  // console.log("blogdata", blog);
 
   const addtoFavorite = () => {};
 
-  const _seeBlogDetails = () => {};
+  const _seeBlogDetails = async () => {
+    axios
+      .put(`${domainPath}/${blog._id}`)
+      .then((res) => {
+        navigation.navigate("BlogDetails", { data: blog });
+      })
+      .catch((err) => {
+        console.log(err.message);
+        navigation.navigate("BlogDetails", { data: blog });
+      });
+  };
 
   const _seeMyFavBlogDetails = () => {
     // const { postId } = blog.value;
@@ -36,7 +52,7 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
       }}
     >
       <View style={styles.profileContainer}>
-        <ProfileComponent onPress={seeProfile} userData={value?.postedBy} />
+        <ProfileComponent onPress={seeProfile} userData={blog?.postedBy} />
 
         {favorite ? (
           <TouchableOpacity
@@ -47,7 +63,7 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
           </TouchableOpacity>
         ) : (
           <>
-            {value?.postedBy?.uid == loggedUser.uid ? null : (
+            {blog?.postedBy?.uid == loggedUser.uid ? null : (
               <TouchableOpacity style={styles.popupBtn} onPress={addtoFavorite}>
                 <Entypo
                   name={
@@ -66,12 +82,12 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
         )}
       </View>
       <View>
-        <Image source={{ uri: value?.featuredImg }} style={styles.imgStyle} />
+        <Image source={{ uri: blog?.featuredImg }} style={styles.imgStyle} />
         <View style={styles.horizontalPadding}>
           <Text style={styles.blogText}>
-            {value?.description.length > 150
-              ? value.description.slice(0, 100) + "..."
-              : value.description}
+            {blog?.description.length > 150
+              ? blog.description.slice(0, 100) + "..."
+              : blog.description}
           </Text>
           {favorite ? (
             <TouchableOpacity

@@ -14,16 +14,19 @@ import Tab from "../../component/Tab";
 import COLOR from "../../COLOR/COLOR";
 import ProfileComponent from "../../component/ProfileComponent";
 import Feather from "react-native-vector-icons/Feather";
+import axios from "axios";
 
 import { LoadingComp } from "../../component/Reuse/Reuse";
+
+const domainPath = "http://192.168.1.4:4000/blog";
 
 const Home = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [allBlogs, setAllBlogs] = useState([]);
   const [myCategorieBlogs, setMyCategorieBlogs] = useState([]);
-  const [myblogerProfile, setmyBlogerProfile] = useState({});
 
   const loggedUser = {};
+  const myblogerProfile = {};
 
   const goToAccount = () => {
     navigation.navigate("Account");
@@ -32,8 +35,20 @@ const Home = ({ navigation }) => {
     navigation.navigate("Notification");
   };
 
+  const getBlogs = async () => {
+    try {
+      const blogData = await axios.get(domainPath);
+
+      // console.log(blogData.data.blog);
+      setAllBlogs(blogData.data.blog);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
+      getBlogs();
       setTimeout(() => {
         setLoading(false);
       }, 2000);

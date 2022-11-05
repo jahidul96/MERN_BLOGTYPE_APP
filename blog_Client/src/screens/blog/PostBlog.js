@@ -17,23 +17,15 @@ import {
   Input,
   LoadingComp,
 } from "../../component/Reuse/Reuse";
-import Context from "../../../context/Context";
 import { useNavigation } from "@react-navigation/native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Picker from "../../component/Picker";
 import MultipleInput from "../../component/MultipleInput";
 import { Height, Width } from "../../../utils/Dimensions";
-import { SingleBlog } from "../../component/SingleBlog";
 import ProfileComponent from "../../component/ProfileComponent";
 import Entypo from "react-native-vector-icons/Entypo";
-import * as ImagePicker from "expo-image-picker";
 import { Tag } from "../../component/Tag";
-import { Timestamp } from "firebase/firestore";
-import {
-  addBlogToFB,
-  uploadFileToStorage,
-} from "../../../firebase/fbFirestore/fbFirestore";
-import { auth } from "../../../firebase/firebase";
+import * as ImagePicker from "expo-image-picker";
 
 const data = [
   "Sport",
@@ -49,14 +41,11 @@ const PostBlog = () => {
   const [tags, setTags] = useState([]);
   const [desc, setDesc] = useState("");
   const [image, setImage] = useState(null);
-  const { loggedUser } = useContext(Context);
   const navigation = useNavigation();
   const [uploading, setUploading] = useState(false);
-  const [type, setType] = useState("");
   const [categorie, setCategorie] = useState("");
   const [pick, setPick] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const uid = auth.currentUser.uid;
 
   const _pickDocument = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -112,7 +101,6 @@ const PostBlog = () => {
       likes: [],
       comments: [],
       postedBy: loggedUser,
-      createdAt: Timestamp.fromDate(new Date()),
       myId: uid,
     };
 

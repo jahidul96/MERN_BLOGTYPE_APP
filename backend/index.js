@@ -4,6 +4,7 @@ require("dotenv").config();
 // imports modules
 const { dbConnection } = require("./db");
 const userRouteHandler = require("./routes/userRoutes");
+const blogRouteHandler = require("./routes/blogRoutes");
 
 // app initialization
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 
 // route handler
 app.use(userRouteHandler);
+app.use(blogRouteHandler);
 
 // db call
 dbConnection();

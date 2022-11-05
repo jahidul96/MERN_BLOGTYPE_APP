@@ -23,137 +23,55 @@ import {
   Input,
   LoadingComp,
 } from "../../component/Reuse/Reuse";
-import {
-  commentPost,
-  deleteFavoriteBlog,
-  FavoriteBlog,
-  getBlogWriterProfile,
-  getSingleBlog,
-  likePost,
-  NotificationFunc,
-  NotifyChange,
-} from "../../../firebase/fbFirestore/fbFirestore";
-import Context from "../../../context/Context";
-import { Timestamp } from "firebase/firestore";
+
 import { Tag } from "../../component/Tag";
-import FavoriteContext from "../../../context/FavoriteContext";
+import axios from "axios";
+
+const domainPath = "http://192.168.1.4:4000/blog";
 
 const BlogDetails = ({ navigation, route }) => {
-  const { id, value } = route.params;
-  const [blog, setSingleBlog] = useState({});
+  const { data } = route.params;
+  const [blog, setSingleBlog] = useState(null);
   const [loadding, setLoading] = useState(true);
-  const { loggedUser } = useContext(Context);
   const [comment, setComment] = useState();
-  const { favoriteBlogs } = useContext(FavoriteContext);
   const [spinner, setSpinner] = useState(false);
   const [blogerProfile, setBlogerProfile] = useState({});
-  const { postedBy } = value;
+  // const { postedBy } = value;
+  const { _id, postedBy } = data;
+
+  const loggedUser = {};
+  const value = {};
 
   const isLiked = blog?.likes?.filter((s) => s.likedBy == loggedUser?.email);
 
-  const isAlreadyFavorite = favoriteBlogs.filter(
-    (favBlog) => favBlog.value.postId == id
-  );
+  // const isAlreadyFavorite = favoriteBlogs.filter(
+  //   (favBlog) => favBlog.value.postId == id
+  // );
 
-  // console.log("isAlreadyFavorite", isAlreadyFavorite.length);
-
-  // console.log("blog", blog);
-
-  // console.log("blogerProfile", blogerProfile);
+  const getThisBlogPost = async () => {
+    try {
+      const data = await axios.get(`${domainPath}/${_id}`);
+      setSingleBlog(data.data.blog);
+      // console.log("single blog data", data.data);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   useEffect(() => {
-    getSingleBlog(setSingleBlog, id);
-    getBlogWriterProfile(value.myId, setBlogerProfile);
+    getThisBlogPost();
     setTimeout(() => {
       setLoading(false);
     }, 2000);
   }, []);
 
-  const favData = {
-    postId: id,
-    postedBy: value.postedBy,
-    description: value.description,
-    featuredImg: value.featuredImg,
-    tags: value.tags,
-    createdAt: Timestamp.fromDate(new Date()),
-  };
+  // console.log("blog", blog.postedBy);
 
-  const addToFavorite = () => {
-    setSpinner(true);
-    if (isAlreadyFavorite.length > 0) {
-      deleteFavoriteBlog(isAlreadyFavorite[0].id)
-        .then(() => {
-          Alert.alert("REMOVED FROM FAVORITE'S!");
-          setSpinner(false);
-        })
-        .catch((err) => {
-          setSpinner(false);
-          Alert.alert("SOMETHING WENT WRONG!");
-          console.log(err.message);
-        });
-    } else {
-      FavoriteBlog(favData);
-      setSpinner(false);
-      return Alert.alert("ADDED TO FAVORITE!");
-    }
-  };
+  const addToFavorite = () => {};
 
-  const _likePost = (data) => {
-    if (isLiked.length == 0) {
-      let val = [
-        ...data.likes,
-        {
-          likedBy: loggedUser.email,
-        },
-      ];
+  const _likePost = (data) => {};
 
-      let notifyVal = [
-        ...blogerProfile?.notifications,
-        {
-          userEmail: loggedUser.email,
-          username: loggedUser.username,
-          type: "like",
-        },
-      ];
-      likePost(val, id);
-      NotificationFunc(notifyVal, blogerProfile?.uid);
-      NotifyChange(blogerProfile?.uid, true);
-    } else {
-      let val = data.likes.filter((st) => st.likedBy != loggedUser.email);
-      likePost(val, id);
-    }
-  };
-
-  const _commentOnPost = () => {
-    if (!comment) {
-      return Alert.alert("WRITE A COMMENT!");
-    }
-    let val = [
-      ...blog?.comments,
-      {
-        postedAt: Timestamp.fromDate(new Date()),
-        comment,
-        commentedBy: loggedUser.username,
-      },
-    ];
-
-    let notifyVal = [
-      ...blogerProfile?.notifications,
-      {
-        userEmail: loggedUser.email,
-        username: loggedUser.username,
-        type: "comment",
-      },
-    ];
-    // setAllComments(val);
-
-    commentPost(val, id);
-    NotificationFunc(notifyVal, blogerProfile?.uid);
-    NotifyChange(blogerProfile?.uid, true);
-    setComment("");
-  };
-
-  // console.log("blog", blog);
+  const _commentOnPost = () => {};
 
   const fetchBlogByTag = (tag) => {
     // Alert.alert(tag);
@@ -162,7 +80,7 @@ const BlogDetails = ({ navigation, route }) => {
   };
 
   const seeProfile = () => {
-    navigation.navigate("Profile", { user: postedBy });
+    // navigation.navigate("Profile", { user: postedBy });
   };
   return (
     <View style={styles.root}>
@@ -173,7 +91,7 @@ const BlogDetails = ({ navigation, route }) => {
         <>
           {spinner && <LoadingComp loadercolor={COLOR.red} />}
           <ImageBackground
-            source={{ uri: blog?.featuredImg }}
+            source={{ uri: data?.featuredImg }}
             style={styles.imgStyle}
           >
             <View style={styles.topContainer}>
@@ -193,9 +111,9 @@ const BlogDetails = ({ navigation, route }) => {
               <ProfileComponent
                 extraColorStyle={styles.extraColorStyle}
                 onPress={seeProfile}
-                userData={blog?.postedBy}
+                userData={data?.postedBy}
               />
-              {value.postedBy.uid == loggedUser.uid ? null : (
+              {/* {value?.postedBy?.uid == loggedUser?.uid ? null : (
                 <TouchableOpacity
                   style={[styles.likeContainer, { marginTop: 0 }]}
                   onPress={addToFavorite}
@@ -204,11 +122,12 @@ const BlogDetails = ({ navigation, route }) => {
                     name="favorite"
                     size={20}
                     color={
-                      isAlreadyFavorite.length > 0 ? COLOR.red : COLOR.white
+                      COLOR.yellow
+                      // isAlreadyFavorite.length > 0 ? COLOR.red : COLOR.white
                     }
                   />
                 </TouchableOpacity>
-              )}
+              )} */}
             </View>
           </ImageBackground>
           {/* likes comment and share */}
@@ -219,16 +138,16 @@ const BlogDetails = ({ navigation, route }) => {
               <CountComp text={blog?.click} name="eye" />
             </View>
 
-            <Text style={[styles.time, { marginTop: 0 }]}>
+            {/* <Text style={[styles.time, { marginTop: 0 }]}>
               {blog?.createdAt.toDate().toLocaleDateString()}
-            </Text>
+            </Text> */}
           </View>
           <View
             style={{
               paddingHorizontal: 15,
             }}
           >
-            <Tag tags={value?.tags} onPress={fetchBlogByTag} />
+            <Tag tags={data?.tags} onPress={fetchBlogByTag} />
           </View>
 
           <ScrollView style={styles.bottomContentWrapper}>
@@ -238,7 +157,7 @@ const BlogDetails = ({ navigation, route }) => {
                   paddingHorizontal: 15,
                 }}
               >
-                <Text style={styles.descText}>{value?.description}</Text>
+                <Text style={styles.descText}>{data?.description}</Text>
               </View>
             </View>
 

@@ -14,7 +14,7 @@ import Favorites from "./src/screens/favorite/Favorites";
 import Notification from "./src/screens/notification/Notification";
 
 import Profile from "./src/screens/profile/Profile";
-// import BlogDetails from "./src/screens/blog/BlogDetails";
+import BlogDetails from "./src/screens/blog/BlogDetails";
 
 // import PostBlog from "./src/screens/blog/PostBlog";
 
@@ -60,6 +60,7 @@ const App = () => {
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Account" component={Account} />
         <Stack.Screen name="Favorites" component={Favorites} />
+        <Stack.Screen name="BlogDetails" component={BlogDetails} />
         <Stack.Screen name="Notification" component={Notification} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="Register" component={Register} />

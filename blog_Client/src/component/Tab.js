@@ -65,8 +65,8 @@ const Tab = ({ allBlogs, myCategorieBlogs }) => {
             <View>
               {allBlogs.length > 0 ? (
                 <>
-                  {allBlogs.map((blog) => (
-                    <SingleBlog key={blog.id} blog={blog} />
+                  {allBlogs.map((blog, index) => (
+                    <SingleBlog key={blog._id} blog={blog} />
                   ))}
                 </>
               ) : (
