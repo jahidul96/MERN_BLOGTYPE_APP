@@ -87,7 +87,7 @@ const Tab = ({ allBlogs, myCategorieBlogs }) => {
                 {myCategorieBlogs.length > 0 ? (
                   <>
                     {myCategorieBlogs.map((blog) => (
-                      <SingleBlog key={blog.id} blog={blog} />
+                      <SingleBlog key={blog._id} blog={blog} />
                     ))}
                   </>
                 ) : (

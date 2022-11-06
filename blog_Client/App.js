@@ -20,7 +20,7 @@ import { AuthContext } from "./src/context/Context";
 
 import PostBlog from "./src/screens/blog/PostBlog";
 
-// import SearchedBlog from "./src/screens/blog/SearchedBlog";
+import SearchedBlog from "./src/screens/blog/SearchedBlog";
 
 // import FetchBlogByTag from "./src/screens/blog/FetchBlogByTag";
 
@@ -77,6 +77,7 @@ const App = () => {
             <Stack.Screen name="Notification" component={Notification} />
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="PostBlog" component={PostBlog} />
+            <Stack.Screen name="SearchedBlog" component={SearchedBlog} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
           </Stack.Navigator>
         ) : (

@@ -17,7 +17,6 @@ const data = [
 
 const SearchComp = () => {
   const [categorie, setCategorie] = useState("");
-  const [selectedCategorie, setSelectedCategorie] = useState("");
   const navigation = useNavigation();
 
   const searchBtn = () => {

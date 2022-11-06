@@ -53,8 +53,6 @@ const Home = ({ navigation }) => {
   const getBlogs = async () => {
     try {
       const blogData = await axios.get(`${APIURL}/blog`);
-
-      // console.log(blogData.data.blog);
       setAllBlogs(blogData.data.blog);
     } catch (error) {
       console.log(error.message);
@@ -62,9 +60,7 @@ const Home = ({ navigation }) => {
   };
 
   const getMyFavBlogs = async () => {
-    const favBlog = await axios.get(
-      `${APIURL}/myfavoriteblog/${user.categorie}`
-    );
+    const favBlog = await axios.get(`${APIURL}/searchblog/${user.categorie}`);
     setMyCategorieBlogs(favBlog.data.blog);
     // console.log(favBlog.data.blog);
   };

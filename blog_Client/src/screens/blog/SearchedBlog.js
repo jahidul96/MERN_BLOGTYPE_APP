@@ -2,16 +2,23 @@ import { ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import COLOR from "../../COLOR/COLOR";
 import { AppBar, LoadingComp } from "../../component/Reuse/Reuse";
-import { getMyCategorieBlogs } from "../../../firebase/fbFirestore/fbFirestore";
 import { SingleBlog } from "../../component/SingleBlog";
+import { APIURL } from "../../api";
+import axios from "axios";
 
 const SearchedBlog = ({ navigation, route }) => {
   const { value } = route.params;
   const [searchedBlogs, setSearchedBlogss] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const getMyFavBlogs = async () => {
+    const favBlog = await axios.get(`${APIURL}/searchblog/${value}`);
+    setSearchedBlogss(favBlog.data.blog);
+    // console.log(favBlog.data.blog);
+  };
+
   useEffect(() => {
-    getMyCategorieBlogs(setSearchedBlogss, value);
+    getMyFavBlogs();
     setTimeout(() => {
       setLoading(false);
     }, 1000);

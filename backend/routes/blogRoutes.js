@@ -68,13 +68,15 @@ router.post("/blog/post", async (req, res, next) => {
   }
 });
 
-router.get("/myfavoriteblog/:categorie", async (req, res, next) => {
+router.get("/searchblog/:categorie", async (req, res, next) => {
   try {
     const categorie = req.params.categorie;
 
     console.log(categorie);
 
-    const blog = await Blog.find({ categorie: categorie });
+    const blog = await Blog.find({ categorie: categorie }).sort({
+      createdAt: -1,
+    });
 
     res.status(200).json({
       succes: true,
