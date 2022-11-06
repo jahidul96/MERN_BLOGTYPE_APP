@@ -27,6 +27,9 @@ import Entypo from "react-native-vector-icons/Entypo";
 import { Tag } from "../../component/Tag";
 import { AuthContext } from "../../context/Context";
 import * as ImagePicker from "expo-image-picker";
+import { uploadFileToStorage } from "../../firebase/FbFireStore";
+import axios from "axios";
+import { APIURL } from "../../api";
 
 const data = [
   "Sport",
@@ -77,7 +80,7 @@ const PostBlog = () => {
     setModalVisible(!modalVisible);
   };
 
-  const submitBlog = () => {
+  const submitBlog = async () => {
     if (!required) {
       return Alert.alert("ALL FIELD REQUIRED!");
     }
@@ -98,24 +101,19 @@ const PostBlog = () => {
       description: desc,
       categorie,
       tags,
-      click: 0,
       likes: [],
       comments: [],
-      postedBy: user,
-      myId: uid,
+      postedBy: user._id,
     };
 
     uploadFileToStorage(image)
-      .then((url) => {
+      .then(async (url) => {
         blog.featuredImg = url;
-        addBlogToFB(blog)
-          .then(() => {
-            setUploading(true);
-            navigation.navigate("Home");
-          })
-          .catch((err) => {
-            throw err;
-          });
+        const response = await axios.post(`${APIURL}/blog/post`, blog);
+        console.log(response.data.message);
+        Alert.alert(response.data.message);
+        setUploading(false);
+        navigation.navigate("Home");
       })
       .catch((err) => {
         setUploading(false);
@@ -147,6 +145,7 @@ const PostBlog = () => {
           categorie={categorie}
           loggedUser={user}
           onPress={submitBlog}
+          uploading={uploading}
         />
       </Modal>
       {uploading && (
@@ -215,10 +214,24 @@ const PostBlog = () => {
 
 export default PostBlog;
 
-const PreviewPostComp = ({ desc, tags, image, loggedUser, onPress }) => {
+const PreviewPostComp = ({
+  desc,
+  tags,
+  image,
+  loggedUser,
+  onPress,
+  uploading,
+}) => {
   return (
     <View style={styles.modelContainer}>
       <View style={styles.modelContentWrapper}>
+        {uploading && (
+          <LoadingComp
+            loadercolor={COLOR.red}
+            textColor={COLOR.red}
+            text="POSTING..."
+          />
+        )}
         <ScrollView>
           <View style={styles.profileContainer}>
             <ProfileComponent userData={loggedUser} />

@@ -12,23 +12,28 @@ import COLOR from "../COLOR/COLOR";
 import ProfileComponent from "./ProfileComponent";
 import Entypo from "react-native-vector-icons/Entypo";
 import axios from "axios";
-
-const domainPath = "http://192.168.1.4:4000/blog";
+import { APIURL } from "../api";
+import { AuthContext } from "../context/Context";
 
 export const SingleBlog = ({ blog, favorite, onPress }) => {
   const navigation = useNavigation();
+  const { user } = useContext(AuthContext);
 
   const loggedUser = {};
+
+  const isAlreadyFavorite = [];
   // const { postedBy } = value;
 
   // console.log("blogdata", blog);
+
+  // console.log("user", user);
 
   const addtoFavorite = () => {};
 
   const _seeBlogDetails = async () => {
     axios
-      .put(`${domainPath}/${blog._id}`)
-      .then((res) => {
+      .put(`${APIURL}/blog/${blog._id}`)
+      .then(() => {
         navigation.navigate("BlogDetails", { data: blog });
       })
       .catch((err) => {
@@ -63,7 +68,7 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
           </TouchableOpacity>
         ) : (
           <>
-            {blog?.postedBy?.uid == loggedUser.uid ? null : (
+            {blog?.postedBy?._id == user?._id ? null : (
               <TouchableOpacity style={styles.popupBtn} onPress={addtoFavorite}>
                 <Entypo
                   name={

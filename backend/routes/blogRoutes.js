@@ -4,10 +4,9 @@ const router = require("express").Router();
 
 router.get("/blog", async (req, res, next) => {
   try {
-    const blog = await Blog.find({}).populate(
-      "postedBy",
-      "username _id email categorie"
-    );
+    const blog = await Blog.find({})
+      .populate("postedBy", "username _id email categorie")
+      .sort({ createdAt: -1 });
     res.status(200).json({
       status: "succes",
       total: blog.length,
@@ -63,6 +62,23 @@ router.post("/blog/post", async (req, res, next) => {
     res.status(201).json({
       status: "succes",
       message: "Blog post Succesfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/myfavoriteblog/:categorie", async (req, res, next) => {
+  try {
+    const categorie = req.params.categorie;
+
+    console.log(categorie);
+
+    const blog = await Blog.find({ categorie: categorie });
+
+    res.status(200).json({
+      succes: true,
+      blog,
     });
   } catch (error) {
     next(error);

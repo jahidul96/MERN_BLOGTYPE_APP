@@ -18,6 +18,7 @@
     "expo-image-picker": "~13.3.1",
     "expo-splash-screen": "~0.16.2",
     "expo-status-bar": "~1.4.0",
+    "firebase": "^9.13.0",
     "react": "18.0.0",
     "react-native": "0.69.6",
     "react-native-element-textinput": "^2.0.1",

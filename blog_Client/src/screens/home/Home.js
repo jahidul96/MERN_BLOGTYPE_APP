@@ -61,15 +61,30 @@ const Home = ({ navigation }) => {
     }
   };
 
+  const getMyFavBlogs = async () => {
+    const favBlog = await axios.get(
+      `${APIURL}/myfavoriteblog/${user.categorie}`
+    );
+    setMyCategorieBlogs(favBlog.data.blog);
+    // console.log(favBlog.data.blog);
+  };
+
   useEffect(() => {
-    getBlogs();
-    getUserFromAsync()
-      .then((data) => setUser(data))
-      .catch((err) => console.log(err.message));
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
+    const unsubscribe = navigation.addListener("focus", () => {
+      getUserFromAsync()
+        .then((data) => {
+          getBlogs();
+          getMyFavBlogs();
+          setUser(data);
+        })
+        .catch((err) => console.log(err.message));
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <SafeAreaView style={homeStyles.root}>
