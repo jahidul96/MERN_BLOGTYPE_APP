@@ -25,6 +25,7 @@ import { Height, Width } from "../../../utils/Dimensions";
 import ProfileComponent from "../../component/ProfileComponent";
 import Entypo from "react-native-vector-icons/Entypo";
 import { Tag } from "../../component/Tag";
+import { AuthContext } from "../../context/Context";
 import * as ImagePicker from "expo-image-picker";
 
 const data = [
@@ -46,6 +47,7 @@ const PostBlog = () => {
   const [categorie, setCategorie] = useState("");
   const [pick, setPick] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const { user, setUser } = useContext(AuthContext);
 
   const _pickDocument = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -54,7 +56,6 @@ const PostBlog = () => {
       aspect: [4, 3],
       quality: 1,
     });
-
     if (!result.cancelled) {
       setImage(result.uri);
     }
@@ -100,7 +101,7 @@ const PostBlog = () => {
       click: 0,
       likes: [],
       comments: [],
-      postedBy: loggedUser,
+      postedBy: user,
       myId: uid,
     };
 
@@ -144,7 +145,7 @@ const PostBlog = () => {
           tags={tags}
           image={image}
           categorie={categorie}
-          loggedUser={loggedUser}
+          loggedUser={user}
           onPress={submitBlog}
         />
       </Modal>

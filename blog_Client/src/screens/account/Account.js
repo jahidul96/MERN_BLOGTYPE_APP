@@ -19,6 +19,7 @@ import { accountStyles } from "./AccountStyle";
 import Feather from "react-native-vector-icons/Feather";
 
 import COLOR from "../../COLOR/COLOR";
+import { AuthContext } from "../../context/Context";
 
 const img = "http://cdn.onlinewebfonts.com/svg/img_550782.png";
 
@@ -26,6 +27,7 @@ const Account = ({ navigation }) => {
   const [image, setImage] = useState(null);
   const [show, setShow] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const { user, setUser } = useContext(AuthContext);
 
   const logout = () => {};
 
@@ -75,12 +77,16 @@ const Account = ({ navigation }) => {
           <View style={accountStyles.profileImageWrapper}>
             <Image
               source={{
-                img,
+                uri: img,
               }}
               style={accountStyles.imgStyle}
             />
-            <Text style={accountStyles.name}>Username</Text>
-            <Text style={accountStyles.email}>user@gmail.com</Text>
+            <Text style={accountStyles.name}>
+              {user?.username ? user?.username : "Username"}
+            </Text>
+            <Text style={accountStyles.email}>
+              {user?.email ? user?.email : "user@gmail.com"}
+            </Text>
           </View>
         </View>
         {show && image ? (

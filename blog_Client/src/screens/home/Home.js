@@ -29,14 +29,11 @@ const Home = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [allBlogs, setAllBlogs] = useState([]);
   const [myCategorieBlogs, setMyCategorieBlogs] = useState([]);
-  const { setUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
 
-  const loggedUser = {};
   const myblogerProfile = {};
 
-  // getUserFromAsync()
-  //   .then((data) => console.log("i am from asyncStorage!!", data))
-  //   .catch((err) => console.log(err.message));
+  // console.log(user);
 
   const goToAccount = () => {
     navigation.navigate("Account");
@@ -44,10 +41,12 @@ const Home = ({ navigation }) => {
 
   const goToNotification = () => {
     // navigation.navigate("Notification");
+    setLoading(true);
     removeValueFromAsync();
     setUser(null);
     setTimeout(() => {
       navigation.navigate("Register");
+      setLoading(false);
     }, 1500);
   };
 
@@ -63,14 +62,13 @@ const Home = ({ navigation }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      getBlogs();
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-    });
-
-    return unsubscribe;
+    getBlogs();
+    getUserFromAsync()
+      .then((data) => setUser(data))
+      .catch((err) => console.log(err.message));
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   }, []);
 
   return (
@@ -85,7 +83,7 @@ const Home = ({ navigation }) => {
       ) : (
         <>
           <View style={homeStyles.profileWrapper}>
-            <ProfileComponent onPress={goToAccount} userData={loggedUser} />
+            <ProfileComponent onPress={goToAccount} userData={user} />
             <TouchableOpacity onPress={goToNotification}>
               <Feather name="bell" size={22} />
               {myblogerProfile?.newNotification == true && (

@@ -12,6 +12,7 @@ import COLOR from "../COLOR/COLOR";
 import { Width } from "../../utils/Dimensions";
 import { SingleBlog } from "./SingleBlog";
 import SearchComp from "./SearchComp";
+import { LoadingComp } from "./Reuse/Reuse";
 
 const tabName = [
   {
@@ -30,9 +31,14 @@ const tabName = [
 
 const Tab = ({ allBlogs, myCategorieBlogs }) => {
   const [tabTitle, setTabTitle] = useState(tabName[0].title);
+  const [loading, setLoading] = useState(false);
 
   const selectTab = (item) => {
     setTabTitle(item.title);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   };
 
   return (
@@ -60,35 +66,39 @@ const Tab = ({ allBlogs, myCategorieBlogs }) => {
         ))}
       </View>
       <View style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.contentWrapper}>
-          {tabTitle == "All" ? (
-            <View>
-              {allBlogs.length > 0 ? (
-                <>
-                  {allBlogs.map((blog, index) => (
-                    <SingleBlog key={blog._id} blog={blog} />
-                  ))}
-                </>
-              ) : (
-                <EmptyTimeline title="No Blog" />
-              )}
-            </View>
-          ) : tabTitle == "For you" ? (
-            <View>
-              {myCategorieBlogs.length > 0 ? (
-                <>
-                  {myCategorieBlogs.map((blog) => (
-                    <SingleBlog key={blog.id} blog={blog} />
-                  ))}
-                </>
-              ) : (
-                <EmptyTimeline title="No Blog" />
-              )}
-            </View>
-          ) : (
-            <SearchComp />
-          )}
-        </ScrollView>
+        {loading ? (
+          <LoadingComp extraLoadderStyle={styles.extraLoadderStyle} />
+        ) : (
+          <ScrollView contentContainerStyle={styles.contentWrapper}>
+            {tabTitle == "All" ? (
+              <View>
+                {allBlogs.length > 0 ? (
+                  <>
+                    {allBlogs.map((blog, index) => (
+                      <SingleBlog key={blog._id} blog={blog} />
+                    ))}
+                  </>
+                ) : (
+                  <EmptyTimeline title="No Blog" />
+                )}
+              </View>
+            ) : tabTitle == "For you" ? (
+              <View>
+                {myCategorieBlogs.length > 0 ? (
+                  <>
+                    {myCategorieBlogs.map((blog) => (
+                      <SingleBlog key={blog.id} blog={blog} />
+                    ))}
+                  </>
+                ) : (
+                  <EmptyTimeline title="No Blog" />
+                )}
+              </View>
+            ) : (
+              <SearchComp />
+            )}
+          </ScrollView>
+        )}
       </View>
     </View>
   );
@@ -154,5 +164,8 @@ const styles = StyleSheet.create({
 
   horizontalPadding: {
     paddingHorizontal: 10,
+  },
+  extraLoadderStyle: {
+    paddingBottom: 150,
   },
 });

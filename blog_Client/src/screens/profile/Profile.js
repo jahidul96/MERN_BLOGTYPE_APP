@@ -13,6 +13,7 @@ import COLOR from "../../COLOR/COLOR";
 import { AppBar, LoadingComp } from "../../component/Reuse/Reuse";
 
 import { SingleBlog } from "../../component/SingleBlog";
+import { AuthContext } from "../../context/Context";
 
 const img = "http://cdn.onlinewebfonts.com/svg/img_550782.png";
 
@@ -20,15 +21,12 @@ const Profile = ({ navigation, route }) => {
   const [loadding, setLoading] = useState(true);
   const [myBlogs, setMyBlogs] = useState([]);
   const [blogerProfile, setBlogerProfile] = useState({});
-  const { user } = route.params;
+  // const { user } = route.params;
+  const { user, setUser } = useContext(AuthContext);
 
   const isFollowedAlready = [];
 
   const loggedUser = {};
-
-  // console.log("user", user);
-
-  // console.log("blogerProfile", blogerProfile);
 
   const followThisUser = () => {
     // console.log(user);
@@ -63,8 +61,8 @@ const Profile = ({ navigation, route }) => {
                 }}
                 style={styles.imgStyle}
               />
-              <Text style={styles.name}>{user.username}</Text>
-              <Text style={styles.email}>{user.email}</Text>
+              <Text style={styles.name}>{user?.username}</Text>
+              <Text style={styles.email}>{user?.email}</Text>
             </View>
             <View style={styles.postContainer}>
               {user.uid == loggedUser.uid ? null : isFollowedAlready?.length >

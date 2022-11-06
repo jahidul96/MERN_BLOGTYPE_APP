@@ -18,7 +18,7 @@ import BlogDetails from "./src/screens/blog/BlogDetails";
 import { getUserFromAsync } from "./utils/LocalStorage";
 import { AuthContext } from "./src/context/Context";
 
-// import PostBlog from "./src/screens/blog/PostBlog";
+import PostBlog from "./src/screens/blog/PostBlog";
 
 // import SearchedBlog from "./src/screens/blog/SearchedBlog";
 
@@ -76,6 +76,7 @@ const App = () => {
             <Stack.Screen name="BlogDetails" component={BlogDetails} />
             <Stack.Screen name="Notification" component={Notification} />
             <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="PostBlog" component={PostBlog} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
           </Stack.Navigator>
         ) : (

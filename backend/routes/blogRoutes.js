@@ -57,15 +57,12 @@ router.put("/blog/:id", async (req, res, next) => {
 });
 
 router.post("/blog/post", async (req, res, next) => {
-  const {} = req.body;
   try {
     const blog = new Blog(req.body);
-
-    const data = await blog.save();
-
+    await blog.save();
     res.status(201).json({
-      message: "Blog post Succesfull",
-      data,
+      status: "succes",
+      message: "Blog post Succesfully",
     });
   } catch (error) {
     next(error);
