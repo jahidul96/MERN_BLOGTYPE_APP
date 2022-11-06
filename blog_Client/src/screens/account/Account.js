@@ -29,6 +29,8 @@ const Account = ({ navigation }) => {
   const [uploading, setUploading] = useState(false);
   const { user, setUser } = useContext(AuthContext);
 
+  // console.log("user", user);
+
   const logout = () => {};
 
   const _pickDocument = async () => {
@@ -108,7 +110,7 @@ const Account = ({ navigation }) => {
           icon={
             <Feather name="chevron-right" size={22} color={COLOR.lightBlue} />
           }
-          onPress={() => navigation.navigate("Profile", { user: {} })}
+          onPress={() => navigation.navigate("Profile", { writer: user })}
         />
         <AccountBtnComp
           text="Post a Blog"

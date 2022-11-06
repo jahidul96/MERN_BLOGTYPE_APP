@@ -48,7 +48,7 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
   };
 
   const seeProfile = () => {
-    // navigation.navigate("Profile", { user: postedBy });
+    navigation.navigate("Profile", { writer: blog?.postedBy });
   };
   return (
     <View

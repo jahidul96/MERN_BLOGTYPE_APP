@@ -21,10 +21,9 @@ router.get("/blog/:id", async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    const blog = await Blog.findOne({ _id: id }).populate(
-      "postedBy",
-      "username _id email categorie"
-    );
+    const blog = await Blog.findOne({ _id: id }).populate("postedBy", {
+      password: 0,
+    });
     res.status(200).json({
       status: "succes!",
       blog,
@@ -72,7 +71,7 @@ router.get("/searchblog/:categorie", async (req, res, next) => {
   try {
     const categorie = req.params.categorie;
 
-    console.log(categorie);
+    // console.log(categorie);
 
     const blog = await Blog.find({ categorie: categorie }).sort({
       createdAt: -1,

@@ -14,15 +14,19 @@ import { AppBar, LoadingComp } from "../../component/Reuse/Reuse";
 
 import { SingleBlog } from "../../component/SingleBlog";
 import { AuthContext } from "../../context/Context";
+import axios from "axios";
+import { APIURL } from "../../api";
 
 const img = "http://cdn.onlinewebfonts.com/svg/img_550782.png";
 
 const Profile = ({ navigation, route }) => {
   const [loadding, setLoading] = useState(true);
   const [myBlogs, setMyBlogs] = useState([]);
-  const [blogerProfile, setBlogerProfile] = useState({});
-  // const { user } = route.params;
+  const [blogerProfile, setBlogerProfile] = useState(null);
+  const { writer } = route.params;
   const { user, setUser } = useContext(AuthContext);
+
+  // console.log("writer", writer);
 
   const isFollowedAlready = [];
 
@@ -32,7 +36,14 @@ const Profile = ({ navigation, route }) => {
     // console.log(user);
   };
 
+  const getThisUser = async () => {
+    const res = await axios.get(`${APIURL}/user/${writer._id}`);
+    // console.log(res.data.user);
+    setBlogerProfile(res.data.user);
+  };
+
   useEffect(() => {
+    getThisUser();
     setTimeout(() => {
       setLoading(false);
     }, 1500);
@@ -57,39 +68,36 @@ const Profile = ({ navigation, route }) => {
             <View style={styles.profileImageWrapper}>
               <Image
                 source={{
-                  uri: user?.profileImg ? user?.profileImg : img,
+                  uri: writer?.profileImg ? writer?.profileImg : img,
                 }}
                 style={styles.imgStyle}
               />
-              <Text style={styles.name}>{user?.username}</Text>
-              <Text style={styles.email}>{user?.email}</Text>
+              <Text style={styles.name}>{writer?.username}</Text>
+              <Text style={styles.email}>{writer?.email}</Text>
             </View>
             <View style={styles.postContainer}>
-              {user.uid == loggedUser.uid ? null : isFollowedAlready?.length >
-                0 ? (
+              {writer._id == user._id ? null : isFollowedAlready?.length > 0 ? (
                 <Counter text="UnFollow" btn onPress={followThisUser} />
               ) : (
                 <Counter text="Follow" btn onPress={followThisUser} />
               )}
 
               <Counter
+                writer={writer}
                 user={user}
-                loggedUser={loggedUser}
                 total={myBlogs?.length}
                 text="Blog"
               />
 
               <Counter
+                writer={writer}
                 user={user}
-                loggedUser={loggedUser}
                 total={blogerProfile?.followers?.length}
                 text="Follower's"
               />
             </View>
             <Text style={styles.postText}>
-              {user.uid == loggedUser.uid
-                ? "MY BLOGS"
-                : `${user.username} Blogs`}
+              {writer._id == user._id ? "MY BLOGS" : `${writer.username} Blogs`}
             </Text>
             <View>
               {myBlogs.length > 0 ? (
@@ -120,7 +128,7 @@ const Profile = ({ navigation, route }) => {
   );
 };
 
-const Counter = ({ total, text, btn, user, loggedUser, onPress }) => (
+const Counter = ({ total, text, btn, user, writer, onPress }) => (
   <>
     {btn ? (
       <TouchableOpacity
@@ -133,7 +141,7 @@ const Counter = ({ total, text, btn, user, loggedUser, onPress }) => (
       <View
         style={[
           styles.counterWrapper,
-          user.uid == loggedUser.uid && {
+          user._id == writer._id && {
             width: Width / 2.7,
           },
         ]}

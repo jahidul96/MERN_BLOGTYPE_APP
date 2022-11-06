@@ -78,8 +78,10 @@ const BlogDetails = ({ navigation, route }) => {
     navigation.navigate("FetchBlogByTag", { id, tag });
   };
 
+  console.log("data?.postedBy", data?.postedBy);
+
   const seeProfile = () => {
-    // navigation.navigate("Profile", { user: postedBy });
+    navigation.navigate("Profile", { writer: data?.postedBy });
   };
   return (
     <View style={styles.root}>
