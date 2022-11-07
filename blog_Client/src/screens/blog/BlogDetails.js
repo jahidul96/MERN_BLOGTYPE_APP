@@ -38,7 +38,10 @@ const BlogDetails = ({ navigation, route }) => {
   const { user } = useContext(AuthContext);
   const [blogLikes, setBlogLikes] = useState([]);
   const [blogComments, setBlogComments] = useState([]);
+  const [bloggerProfile, setBloggerProfile] = useState(null);
   const { _id, postedBy } = data;
+
+  // console.log("bloggerProfile", bloggerProfile);
 
   const isLiked = blogLikes.filter((like) => like.likedBy == user.email);
 
@@ -46,7 +49,12 @@ const BlogDetails = ({ navigation, route }) => {
   //   (favBlog) => favBlog.value.postId == id
   // );
 
-  // console.log("blogLikes", blogLikes);
+  const getMyAccount = async () => {
+    const res = await axios.get(`${APIURL}/user/${postedBy._id}`);
+    setBloggerProfile(res.data.user);
+
+    // console.log("home user data", res.data.user);
+  };
 
   const getThisBlogPost = async () => {
     try {
@@ -54,6 +62,7 @@ const BlogDetails = ({ navigation, route }) => {
       setSingleBlog(data.data.blog);
       setBlogLikes(data.data.blog.likes);
       setBlogComments(data.data.blog.comments);
+
       // console.log("single blog data", data.data);
     } catch (error) {
       console.log(error.message);
@@ -62,6 +71,7 @@ const BlogDetails = ({ navigation, route }) => {
 
   useEffect(() => {
     getThisBlogPost();
+    getMyAccount();
     setTimeout(() => {
       setLoading(false);
     }, 2000);
@@ -69,19 +79,27 @@ const BlogDetails = ({ navigation, route }) => {
 
   const addToFavorite = () => {};
 
-  const likePost = async (val) => {
-    const response = await axios.put(
-      `${APIURL}/blog/likeblog/${blog?._id}`,
-      val
-    );
+  const newNotification = true;
+
+  const likePost = async (val, notifyVal) => {
+    await axios.put(`${APIURL}/blog/likeblog/${blog?._id}`, val);
+
+    await axios.put(`${APIURL}/user/follow/${postedBy._id}`, {
+      val: bloggerProfile?.followers,
+      notifyVal,
+      newNotification,
+    });
     // console.log("response", response.data);
   };
 
-  const commentonBlog = async (val) => {
-    const response = await axios.put(
-      `${APIURL}/blog/comment/${blog?._id}`,
-      val
-    );
+  const commentonBlog = async (val, notifyVal) => {
+    await axios.put(`${APIURL}/blog/comment/${blog?._id}`, val);
+
+    await axios.put(`${APIURL}/user/follow/${postedBy._id}`, {
+      val: bloggerProfile?.followers,
+      notifyVal,
+      newNotification,
+    });
   };
 
   const _likePost = (data) => {
@@ -93,15 +111,15 @@ const BlogDetails = ({ navigation, route }) => {
         },
       ];
 
-      // let notifyVal = [
-      //   ...blogerProfile?.notifications,
-      //   {
-      //     userEmail: loggedUser.email,
-      //     username: loggedUser.username,
-      //     type: "like",
-      //   },
-      // ];
-      likePost(val);
+      let notifyVal = [
+        ...bloggerProfile?.notifications,
+        {
+          userEmail: user.email,
+          username: user.username,
+          type: "like",
+        },
+      ];
+      likePost(val, notifyVal);
       setBlogLikes(val);
       // NotificationFunc(notifyVal, blogerProfile?.uid);
       // NotifyChange(blogerProfile?.uid, true);
@@ -117,7 +135,16 @@ const BlogDetails = ({ navigation, route }) => {
       ...blogComments,
       { commentedBy: user.username, comment, createdAt: Date.now() },
     ];
-    commentonBlog(val);
+
+    let notifyVal = [
+      ...bloggerProfile?.notifications,
+      {
+        userEmail: user.email,
+        username: user.username,
+        type: "comment",
+      },
+    ];
+    commentonBlog(val, notifyVal);
     setBlogComments(val);
     setComment("");
   };

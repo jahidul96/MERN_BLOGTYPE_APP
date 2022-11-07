@@ -33,7 +33,7 @@ const Home = ({ navigation }) => {
   const { user, setUser } = useContext(AuthContext);
   const { updatedUser, setUpdatedUser } = useContext(UpdatedContext);
 
-  // console.log("user", user);
+  // console.log("updatedUser", updatedUser);
 
   const goToAccount = () => {
     navigation.navigate("Account");
