@@ -28,19 +28,20 @@ const Profile = ({ navigation, route }) => {
   const { writer } = route.params;
   const { user, setUser } = useContext(AuthContext);
 
-  // console.log("blogerProfile", blogerProfile);
+  // console.log("blogerProfile", blogerProfile.notifications);
 
   const isFollowedAlready = followers.filter(
     (follower) => follower.followedBy == user.email
   );
 
-  const loggedUser = {};
+  const newNotification = true;
 
-  const follow = async (val) => {
-    const response = await axios.put(
-      `${APIURL}/user/follow/${writer._id}`,
-      val
-    );
+  const follow = async (val, notifyVal) => {
+    await axios.put(`${APIURL}/user/follow/${writer._id}`, {
+      val,
+      notifyVal,
+      newNotification,
+    });
   };
 
   const followThisUser = () => {
@@ -52,18 +53,16 @@ const Profile = ({ navigation, route }) => {
         },
       ];
 
-      // let notifyVal = [
-      //   ...blogerProfile?.notifications,
-      //   {
-      //     userEmail: loggedUser.email,
-      //     username: loggedUser.username,
-      //     type: "like",
-      //   },
-      // ];
-      follow(val);
+      let notifyVal = [
+        ...blogerProfile?.notifications,
+        {
+          userEmail: user.email,
+          username: user.username,
+          type: "follow",
+        },
+      ];
+      follow(val, notifyVal);
       setFollowers(val);
-      // NotificationFunc(notifyVal, blogerProfile?.uid);
-      // NotifyChange(blogerProfile?.uid, true);
     } else {
       let val = followers.filter(
         (follower) => follower.followedBy != user.email

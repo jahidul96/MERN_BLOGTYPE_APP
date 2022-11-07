@@ -90,19 +90,42 @@ router.get("/user/:id", async (req, res, next) => {
 
 router.put("/user/follow/:id", async (req, res, next) => {
   const id = req.params.id;
+  const { val, notifyVal, newNotification } = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          followers: val,
+          notifications: notifyVal,
+          newNotification: newNotification,
+        },
+      }
+    );
+    res.status(201).json({
+      succes: true,
+      message: "updated succesfullY!!!",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/user/notification/:id", async (req, res, next) => {
+  const id = req.params.id;
+  const { newNotification } = req.body;
 
   try {
     const user = await User.findByIdAndUpdate(
       { _id: id },
       {
         $set: {
-          followers: req.body,
+          newNotification: newNotification,
         },
       }
     );
     res.status(201).json({
-      succes: true,
-      user,
+      message: "updated succesfullY!!!",
     });
   } catch (error) {
     next(error);

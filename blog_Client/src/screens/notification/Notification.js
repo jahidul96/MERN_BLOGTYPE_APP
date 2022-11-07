@@ -4,8 +4,9 @@ import COLOR from "../../COLOR/COLOR";
 
 import { AppBar, LoadingComp } from "../../component/Reuse/Reuse";
 
-const Notification = ({ navigation }) => {
+const Notification = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
+  const { myblogerProfile } = route.params;
 
   useEffect(() => {
     setTimeout(() => {
@@ -27,7 +28,30 @@ const Notification = ({ navigation }) => {
             <AppBar navigation={navigation} text="Notifications" />
           </View>
           <ScrollView style={styles.contentWrapper}>
-            <Text style={styles.emptyText}>No Notification</Text>
+            {myblogerProfile?.notifications?.length > 0 ? (
+              myblogerProfile.notifications
+                .reverse()
+                .map((notifyObj, index) => (
+                  <View style={styles.NotificationView} key={index}>
+                    <Text style={styles.name}>{notifyObj.username}</Text>
+                    {notifyObj.type == "like" ? (
+                      <Text style={[styles.text, { color: COLOR.orangeRed }]}>
+                        {" "}
+                        liked your post
+                      </Text>
+                    ) : notifyObj.type == "follow" ? (
+                      <Text style={styles.text}> has followed you</Text>
+                    ) : (
+                      <Text style={[styles.text, { color: COLOR.purple }]}>
+                        {" "}
+                        commented on your blog
+                      </Text>
+                    )}
+                  </View>
+                ))
+            ) : (
+              <Text style={styles.emptyText}>No Notification</Text>
+            )}
           </ScrollView>
         </>
       )}

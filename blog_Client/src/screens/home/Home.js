@@ -17,32 +17,33 @@ import Feather from "react-native-vector-icons/Feather";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { LoadingComp } from "../../component/Reuse/Reuse";
+import { AppBar, LoadingComp } from "../../component/Reuse/Reuse";
 import { APIURL } from "../../api";
 import {
   getUserFromAsync,
   removeValueFromAsync,
 } from "../../../utils/LocalStorage";
-import { AuthContext } from "../../context/Context";
+import { AuthContext, UpdatedContext } from "../../context/Context";
 
 const Home = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [allBlogs, setAllBlogs] = useState([]);
   const [myCategorieBlogs, setMyCategorieBlogs] = useState([]);
+  const [myblogerProfile, setMyBloggerProfile] = useState(null);
   const { user, setUser } = useContext(AuthContext);
+  const { updatedUser, setUpdatedUser } = useContext(UpdatedContext);
 
-  console.log("user", user);
-
-  const myblogerProfile = {};
-
-  // console.log(user);
+  // console.log("user", user);
 
   const goToAccount = () => {
     navigation.navigate("Account");
   };
 
-  const goToNotification = () => {
-    navigation.navigate("Notification");
+  const goToNotification = async () => {
+    await axios.put(`${APIURL}/user/notification/${user._id}`, {
+      newNotification: false,
+    });
+    navigation.navigate("Notification", { myblogerProfile });
   };
 
   const getBlogs = async () => {
@@ -52,6 +53,14 @@ const Home = ({ navigation }) => {
     } catch (error) {
       console.log(error.message);
     }
+  };
+
+  const getMyAccount = async () => {
+    const res = await axios.get(`${APIURL}/user/${user._id}`);
+    setMyBloggerProfile(res.data.user);
+    setUpdatedUser(res.data.user);
+
+    // console.log("home user data", res.data.user);
   };
 
   const getMyFavBlogs = async () => {
@@ -66,6 +75,7 @@ const Home = ({ navigation }) => {
         .then((data) => {
           getBlogs();
           getMyFavBlogs();
+          getMyAccount();
           setUser(data);
         })
         .catch((err) => console.log(err.message));
