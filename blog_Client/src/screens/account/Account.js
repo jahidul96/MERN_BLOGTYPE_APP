@@ -20,6 +20,7 @@ import Feather from "react-native-vector-icons/Feather";
 
 import COLOR from "../../COLOR/COLOR";
 import { AuthContext } from "../../context/Context";
+import { removeValueFromAsync } from "../../../utils/LocalStorage";
 
 const img = "http://cdn.onlinewebfonts.com/svg/img_550782.png";
 
@@ -31,7 +32,15 @@ const Account = ({ navigation }) => {
 
   // console.log("user", user);
 
-  const logout = () => {};
+  const logout = () => {
+    setUploading(true);
+    removeValueFromAsync();
+    setUser(null);
+    setTimeout(() => {
+      navigation.navigate("Register");
+      setUploading(false);
+    }, 1500);
+  };
 
   const _pickDocument = async () => {
     // let result = await ImagePicker.launchImageLibraryAsync({

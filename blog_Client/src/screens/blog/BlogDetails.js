@@ -27,30 +27,33 @@ import {
 import { Tag } from "../../component/Tag";
 import axios from "axios";
 import { APIURL } from "../../api";
+import { AuthContext } from "../../context/Context";
 
 const BlogDetails = ({ navigation, route }) => {
   const { data } = route.params;
   const [blog, setSingleBlog] = useState(null);
   const [loadding, setLoading] = useState(true);
-  const [comment, setComment] = useState();
+  const [comment, setComment] = useState("");
   const [spinner, setSpinner] = useState(false);
-  const [blogerProfile, setBlogerProfile] = useState({});
-  // const { postedBy } = value;
+  const { user } = useContext(AuthContext);
+  const [blogLikes, setBlogLikes] = useState([]);
+  const [blogComments, setBlogComments] = useState([]);
   const { _id, postedBy } = data;
 
-  const loggedUser = {};
-  const value = {};
-
-  const isLiked = blog?.likes?.filter((s) => s.likedBy == loggedUser?.email);
+  const isLiked = blogLikes.filter((like) => like.likedBy == user.email);
 
   // const isAlreadyFavorite = favoriteBlogs.filter(
   //   (favBlog) => favBlog.value.postId == id
   // );
 
+  // console.log("blogLikes", blogLikes);
+
   const getThisBlogPost = async () => {
     try {
       const data = await axios.get(`${APIURL}/blog/${_id}`);
       setSingleBlog(data.data.blog);
+      setBlogLikes(data.data.blog.likes);
+      setBlogComments(data.data.blog.comments);
       // console.log("single blog data", data.data);
     } catch (error) {
       console.log(error.message);
@@ -62,23 +65,71 @@ const BlogDetails = ({ navigation, route }) => {
     setTimeout(() => {
       setLoading(false);
     }, 2000);
-  }, []);
-
-  // console.log("blog", blog.postedBy);
+  }, [_likePost]);
 
   const addToFavorite = () => {};
 
-  const _likePost = (data) => {};
+  const likePost = async (val) => {
+    const response = await axios.put(
+      `${APIURL}/blog/likeblog/${blog?._id}`,
+      val
+    );
+    // console.log("response", response.data);
+  };
 
-  const _commentOnPost = () => {};
+  const commentonBlog = async (val) => {
+    const response = await axios.put(
+      `${APIURL}/blog/comment/${blog?._id}`,
+      val
+    );
+  };
+
+  const _likePost = (data) => {
+    if (isLiked.length == 0) {
+      let val = [
+        ...blogLikes,
+        {
+          likedBy: user.email,
+        },
+      ];
+
+      // let notifyVal = [
+      //   ...blogerProfile?.notifications,
+      //   {
+      //     userEmail: loggedUser.email,
+      //     username: loggedUser.username,
+      //     type: "like",
+      //   },
+      // ];
+      likePost(val);
+      setBlogLikes(val);
+      // NotificationFunc(notifyVal, blogerProfile?.uid);
+      // NotifyChange(blogerProfile?.uid, true);
+    } else {
+      let val = blogLikes.filter((st) => st.likedBy != user.email);
+      likePost(val);
+      setBlogLikes(val);
+    }
+  };
+
+  const _commentOnPost = () => {
+    const val = [
+      ...blogComments,
+      { commentedBy: user.username, comment, createdAt: Date.now() },
+    ];
+    commentonBlog(val);
+    setBlogComments(val);
+    setComment("");
+  };
 
   const fetchBlogByTag = (tag) => {
     // Alert.alert(tag);
-
     navigation.navigate("FetchBlogByTag", { id, tag });
   };
 
-  console.log("data?.postedBy", data?.postedBy);
+  // console.log("data?.postedBy", data?.postedBy);
+  // console.log("blog", blog);
+  // console.log("blog", blog.postedBy);
 
   const seeProfile = () => {
     navigation.navigate("Profile", { writer: data?.postedBy });
@@ -114,7 +165,7 @@ const BlogDetails = ({ navigation, route }) => {
                 onPress={seeProfile}
                 userData={data?.postedBy}
               />
-              {/* {value?.postedBy?.uid == loggedUser?.uid ? null : (
+              {blog?.postedBy._id == user?._id ? null : (
                 <TouchableOpacity
                   style={[styles.likeContainer, { marginTop: 0 }]}
                   onPress={addToFavorite}
@@ -128,20 +179,20 @@ const BlogDetails = ({ navigation, route }) => {
                     }
                   />
                 </TouchableOpacity>
-              )} */}
+              )}
             </View>
           </ImageBackground>
           {/* likes comment and share */}
           <View style={styles.likeandDateWrapper}>
             <View style={styles.countMainContainer}>
-              <CountComp text={blog?.likes?.length} name="heart" />
-              <CountComp text={blog?.comments?.length} name="message" />
+              <CountComp text={blogLikes.length} name="heart" />
+              <CountComp text={blogComments.length} name="message" />
               <CountComp text={blog?.click} name="eye" />
             </View>
 
-            {/* <Text style={[styles.time, { marginTop: 0 }]}>
-              {blog?.createdAt.toDate().toLocaleDateString()}
-            </Text> */}
+            <Text style={[styles.time, { marginTop: 0 }]}>
+              {blog?.createdAt.slice(0, 10)}
+            </Text>
           </View>
           <View
             style={{
@@ -165,8 +216,8 @@ const BlogDetails = ({ navigation, route }) => {
             {/* comment comp */}
 
             <View style={styles.commentContainer}>
-              {blog?.comments?.length > 0 ? (
-                blog?.comments.map((commentValue, index) => (
+              {blogComments.length > 0 ? (
+                blogComments.map((commentValue, index) => (
                   <Comments key={index} commentData={commentValue} />
                 ))
               ) : (
@@ -216,7 +267,7 @@ const Comments = ({ commentData }) => (
         <Text style={styles.commentText}>{commentData?.comment} </Text>
       </View>
       <Text style={styles.time}>
-        {commentData?.postedAt.toDate().toLocaleDateString()}
+        {/* {commentData?.postedAt.toDate().toLocaleDateString()} */}
       </Text>
     </View>
   </View>

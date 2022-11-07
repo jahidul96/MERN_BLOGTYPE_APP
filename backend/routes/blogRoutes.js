@@ -86,4 +86,46 @@ router.get("/searchblog/:categorie", async (req, res, next) => {
   }
 });
 
+router.put("/blog/likeblog/:id", async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const blog = await Blog.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          likes: req.body,
+        },
+      }
+    );
+    res.status(201).json({
+      succes: true,
+      blog,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/blog/comment/:id", async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const blog = await Blog.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          comments: req.body,
+        },
+      }
+    );
+    res.status(201).json({
+      succes: true,
+      blog,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

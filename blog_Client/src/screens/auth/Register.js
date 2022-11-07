@@ -78,6 +78,7 @@ const Register = ({ navigation }) => {
       followers: [],
       newNotification: false,
       notifications: [],
+      favorites: [],
     };
 
     try {

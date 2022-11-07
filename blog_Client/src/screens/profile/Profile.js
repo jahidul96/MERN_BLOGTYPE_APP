@@ -23,23 +23,61 @@ const Profile = ({ navigation, route }) => {
   const [loadding, setLoading] = useState(true);
   const [myBlogs, setMyBlogs] = useState([]);
   const [blogerProfile, setBlogerProfile] = useState(null);
+
+  const [followers, setFollowers] = useState([]);
   const { writer } = route.params;
   const { user, setUser } = useContext(AuthContext);
 
-  // console.log("writer", writer);
+  // console.log("blogerProfile", blogerProfile);
 
-  const isFollowedAlready = [];
+  const isFollowedAlready = followers.filter(
+    (follower) => follower.followedBy == user.email
+  );
 
   const loggedUser = {};
 
+  const follow = async (val) => {
+    const response = await axios.put(
+      `${APIURL}/user/follow/${writer._id}`,
+      val
+    );
+  };
+
   const followThisUser = () => {
-    // console.log(user);
+    if (isFollowedAlready.length == 0) {
+      let val = [
+        ...followers,
+        {
+          followedBy: user.email,
+        },
+      ];
+
+      // let notifyVal = [
+      //   ...blogerProfile?.notifications,
+      //   {
+      //     userEmail: loggedUser.email,
+      //     username: loggedUser.username,
+      //     type: "like",
+      //   },
+      // ];
+      follow(val);
+      setFollowers(val);
+      // NotificationFunc(notifyVal, blogerProfile?.uid);
+      // NotifyChange(blogerProfile?.uid, true);
+    } else {
+      let val = followers.filter(
+        (follower) => follower.followedBy != user.email
+      );
+      follow(val);
+      setFollowers(val);
+    }
   };
 
   const getThisUser = async () => {
     const res = await axios.get(`${APIURL}/user/${writer._id}`);
     // console.log(res.data.user);
     setBlogerProfile(res.data.user);
+    setFollowers(res.data.user.followers);
   };
 
   useEffect(() => {
@@ -92,7 +130,7 @@ const Profile = ({ navigation, route }) => {
               <Counter
                 writer={writer}
                 user={user}
-                total={blogerProfile?.followers?.length}
+                total={followers.length}
                 text="Follower's"
               />
             </View>

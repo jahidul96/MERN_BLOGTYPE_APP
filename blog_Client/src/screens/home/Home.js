@@ -31,6 +31,8 @@ const Home = ({ navigation }) => {
   const [myCategorieBlogs, setMyCategorieBlogs] = useState([]);
   const { user, setUser } = useContext(AuthContext);
 
+  console.log("user", user);
+
   const myblogerProfile = {};
 
   // console.log(user);
@@ -40,14 +42,7 @@ const Home = ({ navigation }) => {
   };
 
   const goToNotification = () => {
-    // navigation.navigate("Notification");
-    setLoading(true);
-    removeValueFromAsync();
-    setUser(null);
-    setTimeout(() => {
-      navigation.navigate("Register");
-      setLoading(false);
-    }, 1500);
+    navigation.navigate("Notification");
   };
 
   const getBlogs = async () => {

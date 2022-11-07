@@ -88,4 +88,25 @@ router.get("/user/:id", async (req, res, next) => {
   }
 });
 
+router.put("/user/follow/:id", async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          followers: req.body,
+        },
+      }
+    );
+    res.status(201).json({
+      succes: true,
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
