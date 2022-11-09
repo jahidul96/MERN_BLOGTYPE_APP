@@ -16,15 +16,24 @@ const Favorites = () => {
   const { favorites, setFavorites } = useContext(FavoriteContext);
   const [favoriteBlog, setFavoriteBlog] = useState([]);
 
-  console.log("favoriteBlogs", favoriteBlog);
+  // console.log("favoriteBlogs", favoriteBlog);
 
   const removefromDb = async (val) => {
-    await axios.put(`${APIURL}/user/addtofavorites/${user._id}`, val);
+    try {
+      const res = await axios.put(
+        `${APIURL}/user/addtofavorites/${user._id}`,
+        val
+      );
+      setFavoriteBlog(res.data.user.favorites);
+    } catch (error) {
+      console.log(error);
+    }
   };
   const removeFromFavorite = (data) => {
-    const val = favorites?.filter((fav) => fav._id != data._id);
+    const val = favorites?.filter((fav) => fav != data._id);
+    const updateFav = favoriteBlog?.filter((fav) => fav._id != data._id);
     setFavorites(val);
-    removefromDb(val);
+    removefromDb(updateFav);
   };
 
   const getMyAccount = async () => {

@@ -33,7 +33,6 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
         val
       );
       setFavorites(res.data.user.favorites);
-      console.log(res.data.user.favorites);
     } catch (error) {
       console.log(error);
     }
@@ -73,7 +72,10 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
       }}
     >
       <View style={styles.profileContainer}>
-        <ProfileComponent onPress={seeProfile} userData={blog?.postedBy} />
+        <ProfileComponent
+          onPress={favorite ? null : seeProfile}
+          userData={blog?.postedBy}
+        />
 
         {favorite ? (
           <TouchableOpacity
