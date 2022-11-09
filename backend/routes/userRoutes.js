@@ -88,6 +88,20 @@ router.get("/user/:id", async (req, res, next) => {
   }
 });
 
+router.get("/user/favorite/:id", async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const user = await User.findById(id).populate("favorites");
+    res.status(200).json({
+      succes: true,
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.put("/user/follow/:id", async (req, res, next) => {
   const id = req.params.id;
   const { val, notifyVal, newNotification } = req.body;
@@ -126,6 +140,30 @@ router.put("/user/notification/:id", async (req, res, next) => {
     );
     res.status(201).json({
       message: "updated succesfullY!!!",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/user/addtofavorites/:id", async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          favorites: req.body,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(201).json({
+      message: "updated succesfullY!!!",
+      user,
     });
   } catch (error) {
     next(error);

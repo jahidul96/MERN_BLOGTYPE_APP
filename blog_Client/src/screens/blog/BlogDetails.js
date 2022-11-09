@@ -27,7 +27,7 @@ import {
 import { Tag } from "../../component/Tag";
 import axios from "axios";
 import { APIURL } from "../../api";
-import { AuthContext } from "../../context/Context";
+import { AuthContext, FavoriteContext } from "../../context/Context";
 
 const BlogDetails = ({ navigation, route }) => {
   const { data } = route.params;
@@ -39,21 +39,16 @@ const BlogDetails = ({ navigation, route }) => {
   const [blogLikes, setBlogLikes] = useState([]);
   const [blogComments, setBlogComments] = useState([]);
   const [bloggerProfile, setBloggerProfile] = useState(null);
+  const { favorites, setFavorites } = useContext(FavoriteContext);
   const { _id, postedBy } = data;
-
-  // console.log("bloggerProfile", bloggerProfile);
 
   const isLiked = blogLikes.filter((like) => like.likedBy == user.email);
 
-  // const isAlreadyFavorite = favoriteBlogs.filter(
-  //   (favBlog) => favBlog.value.postId == id
-  // );
+  const isAlreadyFavorite = favorites.filter((fav) => fav == _id);
 
   const getMyAccount = async () => {
     const res = await axios.get(`${APIURL}/user/${postedBy._id}`);
     setBloggerProfile(res.data.user);
-
-    // console.log("home user data", res.data.user);
   };
 
   const getThisBlogPost = async () => {
@@ -77,7 +72,30 @@ const BlogDetails = ({ navigation, route }) => {
     }, 2000);
   }, [_likePost]);
 
-  const addToFavorite = () => {};
+  const addToFavorite = () => {
+    if (isAlreadyFavorite.length == 0) {
+      const val = [...favorites, blog._id];
+      setFavorites(val);
+      addFavToDb(val);
+    } else {
+      const val = favorites.filter((fav) => fav != blog._id);
+      setFavorites(val);
+      addFavToDb(val);
+    }
+  };
+
+  const addFavToDb = async (val) => {
+    try {
+      const res = await axios.put(
+        `${APIURL}/user/addtofavorites/${user._id}`,
+        val
+      );
+      setFavorites(res.data.user.favorites);
+      console.log(res.data.user.favorites);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const newNotification = true;
 
@@ -89,7 +107,6 @@ const BlogDetails = ({ navigation, route }) => {
       notifyVal,
       newNotification,
     });
-    // console.log("response", response.data);
   };
 
   const commentonBlog = async (val, notifyVal) => {
@@ -102,7 +119,7 @@ const BlogDetails = ({ navigation, route }) => {
     });
   };
 
-  const _likePost = (data) => {
+  const _likePost = () => {
     if (isLiked.length == 0) {
       let val = [
         ...blogLikes,
@@ -121,8 +138,6 @@ const BlogDetails = ({ navigation, route }) => {
       ];
       likePost(val, notifyVal);
       setBlogLikes(val);
-      // NotificationFunc(notifyVal, blogerProfile?.uid);
-      // NotifyChange(blogerProfile?.uid, true);
     } else {
       let val = blogLikes.filter((st) => st.likedBy != user.email);
       likePost(val);
@@ -153,10 +168,6 @@ const BlogDetails = ({ navigation, route }) => {
     // Alert.alert(tag);
     navigation.navigate("FetchBlogByTag", { id, tag });
   };
-
-  // console.log("data?.postedBy", data?.postedBy);
-  // console.log("blog", blog);
-  // console.log("blog", blog.postedBy);
 
   const seeProfile = () => {
     navigation.navigate("Profile", { writer: data?.postedBy });
@@ -201,8 +212,7 @@ const BlogDetails = ({ navigation, route }) => {
                     name="favorite"
                     size={20}
                     color={
-                      COLOR.yellow
-                      // isAlreadyFavorite.length > 0 ? COLOR.red : COLOR.white
+                      isAlreadyFavorite.length > 0 ? COLOR.red : COLOR.white
                     }
                   />
                 </TouchableOpacity>

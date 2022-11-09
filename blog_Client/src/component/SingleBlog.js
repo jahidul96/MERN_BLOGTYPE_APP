@@ -13,22 +13,43 @@ import ProfileComponent from "./ProfileComponent";
 import Entypo from "react-native-vector-icons/Entypo";
 import axios from "axios";
 import { APIURL } from "../api";
-import { AuthContext } from "../context/Context";
+import {
+  AuthContext,
+  FavoriteContext,
+  UpdatedContext,
+} from "../context/Context";
 
 export const SingleBlog = ({ blog, favorite, onPress }) => {
   const navigation = useNavigation();
   const { user } = useContext(AuthContext);
+  const { favorites, setFavorites } = useContext(FavoriteContext);
 
-  const loggedUser = {};
+  const isAlreadyFavorite = favorites?.filter((fav) => fav == blog._id);
 
-  const isAlreadyFavorite = [];
-  // const { postedBy } = value;
+  const addFavToDb = async (val) => {
+    try {
+      const res = await axios.put(
+        `${APIURL}/user/addtofavorites/${user._id}`,
+        val
+      );
+      setFavorites(res.data.user.favorites);
+      console.log(res.data.user.favorites);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  // console.log("blogdata", blog);
-
-  // console.log("user", user);
-
-  const addtoFavorite = () => {};
+  const addtoFavorite = () => {
+    if (isAlreadyFavorite.length == 0) {
+      const val = [...favorites, blog._id];
+      setFavorites(val);
+      addFavToDb(val);
+    } else {
+      const val = favorites.filter((fav) => fav != blog._id);
+      setFavorites(val);
+      addFavToDb(val);
+    }
+  };
 
   const _seeBlogDetails = async () => {
     axios
@@ -40,11 +61,6 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
         console.log(err.message);
         navigation.navigate("BlogDetails", { data: blog });
       });
-  };
-
-  const _seeMyFavBlogDetails = () => {
-    // const { postId } = blog.value;
-    // navigation.navigate("BlogDetails", { id: postId, value });
   };
 
   const seeProfile = () => {
@@ -94,14 +110,7 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
               ? blog.description.slice(0, 100) + "..."
               : blog.description}
           </Text>
-          {favorite ? (
-            <TouchableOpacity
-              style={styles.readmoreBtn}
-              onPress={_seeMyFavBlogDetails}
-            >
-              <Text style={styles.readmoreText}>Read more</Text>
-            </TouchableOpacity>
-          ) : (
+          {favorite ? null : (
             <TouchableOpacity
               style={styles.readmoreBtn}
               onPress={_seeBlogDetails}

@@ -23,7 +23,11 @@ import {
   getUserFromAsync,
   removeValueFromAsync,
 } from "../../../utils/LocalStorage";
-import { AuthContext, UpdatedContext } from "../../context/Context";
+import {
+  AuthContext,
+  FavoriteContext,
+  UpdatedContext,
+} from "../../context/Context";
 
 const Home = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -32,8 +36,9 @@ const Home = ({ navigation }) => {
   const [myblogerProfile, setMyBloggerProfile] = useState(null);
   const { user, setUser } = useContext(AuthContext);
   const { updatedUser, setUpdatedUser } = useContext(UpdatedContext);
+  const { setFavorites } = useContext(FavoriteContext);
 
-  // console.log("updatedUser", updatedUser);
+  // console.log("myblogerProfile", myblogerProfile);
 
   const goToAccount = () => {
     navigation.navigate("Account");
@@ -59,6 +64,7 @@ const Home = ({ navigation }) => {
     const res = await axios.get(`${APIURL}/user/${user._id}`);
     setMyBloggerProfile(res.data.user);
     setUpdatedUser(res.data.user);
+    setFavorites(res.data.user.favorites);
 
     // console.log("home user data", res.data.user);
   };
