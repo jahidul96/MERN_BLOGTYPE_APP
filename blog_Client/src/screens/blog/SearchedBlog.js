@@ -5,20 +5,15 @@ import { AppBar, LoadingComp } from "../../component/Reuse/Reuse";
 import { SingleBlog } from "../../component/SingleBlog";
 import { APIURL } from "../../api";
 import axios from "axios";
+import { getMyFavBlogs } from "../../api/blogApi";
 
 const SearchedBlog = ({ navigation, route }) => {
   const { value } = route.params;
   const [searchedBlogs, setSearchedBlogss] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getMyFavBlogs = async () => {
-    const favBlog = await axios.get(`${APIURL}/searchblog/${value}`);
-    setSearchedBlogss(favBlog.data.blog);
-    // console.log(favBlog.data.blog);
-  };
-
   useEffect(() => {
-    getMyFavBlogs();
+    getMyFavBlogs(setSearchedBlogss, value);
     setTimeout(() => {
       setLoading(false);
     }, 1000);

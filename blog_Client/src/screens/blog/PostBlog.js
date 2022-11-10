@@ -52,6 +52,8 @@ const PostBlog = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const { user, setUser } = useContext(AuthContext);
 
+  const checkTag = tags.map((tag) => tag.includes("#"));
+
   const _pickDocument = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -78,9 +80,6 @@ const PostBlog = () => {
       return Alert.alert("MAXIMUM THREE TAGS!");
     }
 
-    if (tags.map((tag) => tag.includes("#"))) {
-      return Alert.alert("# Can't add on tag!");
-    }
     setModalVisible(!modalVisible);
   };
 
@@ -94,9 +93,7 @@ const PostBlog = () => {
     if (tags.length > 3) {
       return Alert.alert("MAXIMUM THREE TAGS!");
     }
-    if (tags.map((tag) => tag.includes("#"))) {
-      return Alert.alert("# Can't add on tag!");
-    }
+
     if (desc.length < 200) {
       return Alert.alert(
         "BLOG DETAIL'S NEED TO BE AT LEAST 200 CHARACTER LONG!"

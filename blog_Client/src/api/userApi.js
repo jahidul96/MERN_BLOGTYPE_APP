@@ -1,12 +1,21 @@
 import axios from "axios";
 import { APIURL } from "./index";
 
-export const getMyAccount = async (routepath) => {
+export const getAccountData = async (id) => {
   try {
-    await axios.get(`${APIURL}/${routepath}`);
+    const res = await axios.get(`${APIURL}/user/${id}`);
+
+    return res.data.user;
   } catch (error) {
     console.log(error.message);
   }
+};
 
-  // console.log("home user data", res.data.user);
+export const addFavToDb = async (val, id) => {
+  try {
+    const res = await axios.put(`${APIURL}/user/addtofavorites/${id}`, val);
+    return res.data.user.favorites;
+  } catch (error) {
+    console.log(error);
+  }
 };

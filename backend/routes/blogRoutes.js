@@ -73,9 +73,11 @@ router.get("/searchblog/:categorie", async (req, res, next) => {
 
     // console.log(categorie);
 
-    const blog = await Blog.find({ categorie: categorie }).sort({
-      createdAt: -1,
-    });
+    const blog = await Blog.find({ categorie: categorie })
+      .sort({
+        createdAt: -1,
+      })
+      .populate("postedBy");
 
     res.status(200).json({
       succes: true,

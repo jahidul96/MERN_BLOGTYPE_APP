@@ -25,6 +25,8 @@ import {
   FavoriteContext,
   UpdatedContext,
 } from "../../context/Context";
+import { getAccountData } from "../../api/userApi";
+import { getBlogs, getMyFavBlogs } from "../../api/blogApi";
 
 const Home = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -34,8 +36,6 @@ const Home = ({ navigation }) => {
   const { user, setUser } = useContext(AuthContext);
   const { updatedUser, setUpdatedUser } = useContext(UpdatedContext);
   const { setFavorites } = useContext(FavoriteContext);
-
-  // console.log("myblogerProfile", myblogerProfile);
 
   const goToAccount = () => {
     navigation.navigate("Account");
@@ -48,37 +48,21 @@ const Home = ({ navigation }) => {
     navigation.navigate("Notification", { myblogerProfile });
   };
 
-  const getBlogs = async () => {
-    try {
-      const blogData = await axios.get(`${APIURL}/blog`);
-      setAllBlogs(blogData.data.blog);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const getMyAccount = async () => {
-    const res = await axios.get(`${APIURL}/user/${user._id}`);
-    setMyBloggerProfile(res.data.user);
-    setUpdatedUser(res.data.user);
-    setFavorites(res.data.user.favorites);
-
-    // console.log("home user data", res.data.user);
-  };
-
-  const getMyFavBlogs = async () => {
-    const favBlog = await axios.get(`${APIURL}/searchblog/${user.categorie}`);
-    setMyCategorieBlogs(favBlog.data.blog);
-    // console.log(favBlog.data.blog);
-  };
-
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       getUserFromAsync()
         .then((data) => {
-          getBlogs();
-          getMyFavBlogs();
-          getMyAccount();
+          getBlogs(setAllBlogs);
+          getMyFavBlogs(setMyCategorieBlogs, data.categorie);
+          getAccountData(data._id)
+            .then((value) => {
+              setMyBloggerProfile(value);
+              setUpdatedUser(value);
+              setFavorites(value.favorites);
+            })
+            .catch((err) => {
+              console.log(err.message);
+            });
           setUser(data);
         })
         .catch((err) => console.log(err.message));

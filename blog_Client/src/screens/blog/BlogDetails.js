@@ -28,6 +28,8 @@ import { Tag } from "../../component/Tag";
 import axios from "axios";
 import { APIURL } from "../../api";
 import { AuthContext, FavoriteContext } from "../../context/Context";
+import { addFavToDb, getAccountData } from "../../api/userApi";
+import { getThisBlogPost } from "../../api/blogApi";
 
 const BlogDetails = ({ navigation, route }) => {
   const { data } = route.params;
@@ -46,61 +48,40 @@ const BlogDetails = ({ navigation, route }) => {
 
   const isAlreadyFavorite = favorites.filter((fav) => fav == _id);
 
-  const getMyAccount = async () => {
-    const res = await axios.get(`${APIURL}/user/${postedBy._id}`);
-    setBloggerProfile(res.data.user);
-  };
-
-  const getThisBlogPost = async () => {
-    try {
-      const data = await axios.get(`${APIURL}/blog/${_id}`);
-      setSingleBlog(data.data.blog);
-      setBlogLikes(data.data.blog.likes);
-      setBlogComments(data.data.blog.comments);
-
-      // console.log("single blog data", data.data);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
   useEffect(() => {
-    getThisBlogPost();
-    getMyAccount();
+    getThisBlogPost(_id).then((data) => {
+      setSingleBlog(data);
+      setBlogLikes(data.likes);
+      setBlogComments(data.comments);
+    });
+    getAccountData(postedBy._id).then((data) => {
+      setBloggerProfile(data);
+    });
     setTimeout(() => {
       setLoading(false);
     }, 2000);
-  }, [_likePost]);
+  }, []);
 
   const addToFavorite = () => {
     if (isAlreadyFavorite.length == 0) {
       const val = [...favorites, blog._id];
       setFavorites(val);
-      addFavToDb(val);
+      addFavToDb(val, user._id).then((value) => {
+        setFavorites(value);
+      });
     } else {
       const val = favorites.filter((fav) => fav != blog._id);
       setFavorites(val);
-      addFavToDb(val);
-    }
-  };
-
-  const addFavToDb = async (val) => {
-    try {
-      const res = await axios.put(
-        `${APIURL}/user/addtofavorites/${user._id}`,
-        val
-      );
-      setFavorites(res.data.user.favorites);
-      console.log(res.data.user.favorites);
-    } catch (error) {
-      console.log(error);
+      addFavToDb(val, user._id).then((value) => {
+        setFavorites(value);
+      });
     }
   };
 
   const newNotification = true;
 
-  const likePost = async (val, notifyVal) => {
-    await axios.put(`${APIURL}/blog/likeblog/${blog?._id}`, val);
+  const commentonBlog = async (val, notifyVal) => {
+    await axios.put(`${APIURL}/blog/comment/${blog?._id}`, val);
 
     await axios.put(`${APIURL}/user/follow/${postedBy._id}`, {
       val: bloggerProfile?.followers,
@@ -109,8 +90,8 @@ const BlogDetails = ({ navigation, route }) => {
     });
   };
 
-  const commentonBlog = async (val, notifyVal) => {
-    await axios.put(`${APIURL}/blog/comment/${blog?._id}`, val);
+  const likePost = async (val, notifyVal) => {
+    await axios.put(`${APIURL}/blog/likeblog/${blog?._id}`, val);
 
     await axios.put(`${APIURL}/user/follow/${postedBy._id}`, {
       val: bloggerProfile?.followers,
