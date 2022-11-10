@@ -93,6 +93,7 @@ router.get("/user/favorite/:id", async (req, res, next) => {
 
   try {
     const user = await User.findById(id).populate("favorites");
+
     res.status(200).json({
       succes: true,
       user,
@@ -173,7 +174,6 @@ router.put("/user/addtofavorites/:id", async (req, res, next) => {
 router.put("/user/updateprofilepic/:id", async (req, res, next) => {
   const { url } = req.body;
 
-  console.log(url);
   try {
     const user = await User.findByIdAndUpdate(
       { _id: req.params.id },

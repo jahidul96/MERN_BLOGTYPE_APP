@@ -35,15 +35,11 @@ const Account = ({ navigation }) => {
   const { user, setUser } = useContext(AuthContext);
   const { updatedUser, setUpdatedUser } = useContext(UpdatedContext);
 
-  // console.log("user", user);
-
-  // console.log("updatedUser", updatedUser);
-
   const logout = () => {
     setUploading(true);
-    removeValueFromAsync();
-    setUser(null);
     setTimeout(() => {
+      removeValueFromAsync();
+      setUser(null);
       navigation.navigate("Register");
       setUploading(false);
     }, 1500);
@@ -82,8 +78,6 @@ const Account = ({ navigation }) => {
       }
     });
   };
-
-  // console.log("loggedUser", loggedUser);
 
   return (
     <SafeAreaView style={{ backgroundColor: COLOR.white, flex: 1 }}>
