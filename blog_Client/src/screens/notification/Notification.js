@@ -36,14 +36,12 @@ const Notification = ({ navigation, route }) => {
                     <Text style={styles.name}>{notifyObj.username}</Text>
                     {notifyObj.type == "like" ? (
                       <Text style={[styles.text, { color: COLOR.orangeRed }]}>
-                        {" "}
                         liked your post
                       </Text>
                     ) : notifyObj.type == "follow" ? (
                       <Text style={styles.text}> has followed you</Text>
                     ) : (
                       <Text style={[styles.text, { color: COLOR.purple }]}>
-                        {" "}
                         commented on your blog
                       </Text>
                     )}
