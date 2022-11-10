@@ -128,4 +128,18 @@ router.put("/blog/comment/:id", async (req, res, next) => {
   }
 });
 
+router.get("/searchbytag/:tag", async (req, res, next) => {
+  console.log(req.params.tag);
+  try {
+    const blogs = await Blog.find({ tags: { $in: [req.params.tag] } });
+
+    res.status(200).json({
+      status: "succes",
+      blogs,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

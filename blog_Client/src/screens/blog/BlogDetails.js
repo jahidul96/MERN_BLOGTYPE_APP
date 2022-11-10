@@ -164,9 +164,13 @@ const BlogDetails = ({ navigation, route }) => {
     setComment("");
   };
 
-  const fetchBlogByTag = (tag) => {
-    // Alert.alert(tag);
-    navigation.navigate("FetchBlogByTag", { id, tag });
+  const fetchBlogByTag = async (tag) => {
+    try {
+      const res = await axios.get(`${APIURL}/searchbytag/${tag}`);
+      navigation.navigate("FetchBlogByTag", { blogs: res.data.blogs, tag });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const seeProfile = () => {

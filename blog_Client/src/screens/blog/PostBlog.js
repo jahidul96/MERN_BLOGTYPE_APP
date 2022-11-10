@@ -77,6 +77,10 @@ const PostBlog = () => {
     if (tags.length > 3) {
       return Alert.alert("MAXIMUM THREE TAGS!");
     }
+
+    if (tags.map((tag) => tag.includes("#"))) {
+      return Alert.alert("# Can't add on tag!");
+    }
     setModalVisible(!modalVisible);
   };
 
@@ -89,6 +93,9 @@ const PostBlog = () => {
     }
     if (tags.length > 3) {
       return Alert.alert("MAXIMUM THREE TAGS!");
+    }
+    if (tags.map((tag) => tag.includes("#"))) {
+      return Alert.alert("# Can't add on tag!");
     }
     if (desc.length < 200) {
       return Alert.alert(

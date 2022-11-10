@@ -1,8 +1,9 @@
 import { ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import COLOR from "../../COLOR/COLOR";
 
 import { AppBar, LoadingComp } from "../../component/Reuse/Reuse";
+import { AuthContext } from "../../context/Context";
 
 const Notification = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
@@ -36,12 +37,14 @@ const Notification = ({ navigation, route }) => {
                     <Text style={styles.name}>{notifyObj.username}</Text>
                     {notifyObj.type == "like" ? (
                       <Text style={[styles.text, { color: COLOR.orangeRed }]}>
+                        {" "}
                         liked your post
                       </Text>
                     ) : notifyObj.type == "follow" ? (
                       <Text style={styles.text}> has followed you</Text>
                     ) : (
                       <Text style={[styles.text, { color: COLOR.purple }]}>
+                        {" "}
                         commented on your blog
                       </Text>
                     )}
