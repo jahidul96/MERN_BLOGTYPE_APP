@@ -170,4 +170,28 @@ router.put("/user/addtofavorites/:id", async (req, res, next) => {
   }
 });
 
+router.put("/user/updateprofilepic/:id", async (req, res, next) => {
+  const { url } = req.body;
+
+  console.log(url);
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      {
+        $set: {
+          profileImg: url,
+        },
+      },
+      { new: true }
+    );
+
+    res.status(201).json({
+      status: "succes",
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

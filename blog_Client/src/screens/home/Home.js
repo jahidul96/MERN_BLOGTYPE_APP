@@ -19,10 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { AppBar, LoadingComp } from "../../component/Reuse/Reuse";
 import { APIURL } from "../../api";
-import {
-  getUserFromAsync,
-  removeValueFromAsync,
-} from "../../../utils/LocalStorage";
+import { getUserFromAsync } from "../../../utils/LocalStorage";
 import {
   AuthContext,
   FavoriteContext,
@@ -105,7 +102,7 @@ const Home = ({ navigation }) => {
       ) : (
         <>
           <View style={homeStyles.profileWrapper}>
-            <ProfileComponent onPress={goToAccount} userData={user} />
+            <ProfileComponent onPress={goToAccount} userData={updatedUser} />
             <TouchableOpacity onPress={goToNotification}>
               <Feather name="bell" size={22} />
               {myblogerProfile?.newNotification == true && (

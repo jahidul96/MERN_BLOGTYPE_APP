@@ -19,8 +19,12 @@ import { accountStyles } from "./AccountStyle";
 import Feather from "react-native-vector-icons/Feather";
 
 import COLOR from "../../COLOR/COLOR";
-import { AuthContext } from "../../context/Context";
+import { AuthContext, UpdatedContext } from "../../context/Context";
 import { removeValueFromAsync } from "../../../utils/LocalStorage";
+import { uploadFileToStorage } from "../../firebase/FbFireStore";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
+import { APIURL } from "../../api";
 
 const img = "http://cdn.onlinewebfonts.com/svg/img_550782.png";
 
@@ -29,8 +33,11 @@ const Account = ({ navigation }) => {
   const [show, setShow] = useState(false);
   const [uploading, setUploading] = useState(false);
   const { user, setUser } = useContext(AuthContext);
+  const { updatedUser, setUpdatedUser } = useContext(UpdatedContext);
 
   // console.log("user", user);
+
+  // console.log("updatedUser", updatedUser);
 
   const logout = () => {
     setUploading(true);
@@ -43,35 +50,37 @@ const Account = ({ navigation }) => {
   };
 
   const _pickDocument = async () => {
-    // let result = await ImagePicker.launchImageLibraryAsync({
-    //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    //   allowsEditing: true,
-    //   aspect: [4, 3],
-    //   quality: 1,
-    // });
-    // if (!result.cancelled) {
-    //   setImage(result.uri);
-    //   setShow(true);
-    // }
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      setImage(result.uri);
+      setShow(true);
+    }
   };
 
   const uploadProfilePic = async () => {
-    // setUploading(true);
-    // uploadFileToStorage(image).then((url) => {
-    //   addProfilePic(url)
-    //     .then(() => {
-    //       setUploading(false);
-    //       Alert.alert("profile pic added succesfully");
-    //       setShow(false);
-    //       getCurrentUser().then((user) => {
-    //         setLoggedUser(user);
-    //       });
-    //     })
-    //     .catch((err) => {
-    //       setUploading(false);
-    //       Alert.alert("something went wrong");
-    //     });
-    // });
+    setUploading(true);
+    uploadFileToStorage(image).then(async (url) => {
+      console.log("url", url);
+      try {
+        const res = await axios.put(
+          `${APIURL}/user/updateprofilepic/${user._id}`,
+          { url }
+        );
+        setUploading(false);
+        setShow(false);
+        console.log(res.data);
+        setUpdatedUser(res.data.user);
+      } catch (error) {
+        console.log(error);
+        setUploading(false);
+        setShow(false);
+      }
+    });
   };
 
   // console.log("loggedUser", loggedUser);
@@ -88,15 +97,15 @@ const Account = ({ navigation }) => {
           <View style={accountStyles.profileImageWrapper}>
             <Image
               source={{
-                uri: img,
+                uri: updatedUser?.profileImg ? updatedUser?.profileImg : img,
               }}
               style={accountStyles.imgStyle}
             />
             <Text style={accountStyles.name}>
-              {user?.username ? user?.username : "Username"}
+              {updatedUser?.username ? updatedUser?.username : "Username"}
             </Text>
             <Text style={accountStyles.email}>
-              {user?.email ? user?.email : "user@gmail.com"}
+              {updatedUser?.email ? updatedUser?.email : "user@gmail.com"}
             </Text>
           </View>
         </View>
@@ -119,7 +128,9 @@ const Account = ({ navigation }) => {
           icon={
             <Feather name="chevron-right" size={22} color={COLOR.lightBlue} />
           }
-          onPress={() => navigation.navigate("Profile", { writer: user })}
+          onPress={() =>
+            navigation.navigate("Profile", { writer: updatedUser })
+          }
         />
         <AccountBtnComp
           text="Post a Blog"
