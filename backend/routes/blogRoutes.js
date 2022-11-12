@@ -5,7 +5,7 @@ const router = require("express").Router();
 router.get("/blog", async (req, res, next) => {
   try {
     const blog = await Blog.find({})
-      .populate("postedBy", "username _id email categorie")
+      .populate("postedBy", "username _id email categorie profileImg")
       .sort({ createdAt: -1 });
     res.status(200).json({
       status: "succes",

@@ -63,7 +63,8 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
   };
 
   const seeProfile = () => {
-    navigation.navigate("Profile", { writer: blog?.postedBy });
+    console.log(blog?.postedBy);
+    // navigation.navigate("Profile", { writer: blog?.postedBy });
   };
   return (
     <View
@@ -112,7 +113,14 @@ export const SingleBlog = ({ blog, favorite, onPress }) => {
               ? blog.description.slice(0, 100) + "..."
               : blog.description}
           </Text>
-          {favorite ? null : (
+          {favorite ? (
+            <TouchableOpacity
+              style={styles.readmoreBtn}
+              onPress={_seeBlogDetails}
+            >
+              <Text style={styles.readmoreText}>Read more</Text>
+            </TouchableOpacity>
+          ) : (
             <TouchableOpacity
               style={styles.readmoreBtn}
               onPress={_seeBlogDetails}

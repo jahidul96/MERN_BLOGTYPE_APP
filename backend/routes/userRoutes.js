@@ -92,7 +92,14 @@ router.get("/user/favorite/:id", async (req, res, next) => {
   const id = req.params.id;
 
   try {
-    const user = await User.findById(id).populate("favorites");
+    const user = await User.findById(id).populate({
+      path: "favorites",
+      model: "Blog",
+      populate: {
+        path: "postedBy",
+        model: "User",
+      },
+    });
 
     res.status(200).json({
       succes: true,
