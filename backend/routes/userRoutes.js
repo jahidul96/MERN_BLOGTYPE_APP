@@ -73,6 +73,40 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
+router.put("/resetpassword", async (req, res, next) => {
+  const { email, password } = req.body;
+  const id = req.params.id;
+  const hasedPassword = await bcrypt.hash(password, 10);
+
+  try {
+    const isThere = await User.findOne({ email: email });
+    if (!isThere) {
+      return res.status(500).json({
+        status: "Failed",
+        message: "Wrong Email!",
+      });
+    }
+
+    const user = await User.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          password: hasedPassword,
+        },
+      },
+      { new: true }
+    );
+
+    res.status(201).json({
+      status: "succes",
+      user,
+      message: "Password Updated succesfully!",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/user/:id", async (req, res, next) => {
   const id = req.params.id;
 
