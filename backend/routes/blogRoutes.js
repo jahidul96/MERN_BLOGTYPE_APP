@@ -33,6 +33,22 @@ router.get("/blog/:id", async (req, res, next) => {
   }
 });
 
+router.get("/blog/myblog/:id", async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const blog = await Blog.find({ postedBy: id }).populate("postedBy", {
+      password: 0,
+    });
+    res.status(200).json({
+      status: "succes!",
+      blog,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.put("/blog/:id", async (req, res, next) => {
   try {
     const id = req.params.id;

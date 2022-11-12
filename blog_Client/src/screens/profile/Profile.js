@@ -28,8 +28,6 @@ const Profile = ({ navigation, route }) => {
   const { writer } = route.params;
   const { user, setUser } = useContext(AuthContext);
 
-  // console.log("blogerProfile", blogerProfile.notifications);
-
   const isFollowedAlready = followers.filter(
     (follower) => follower.followedBy == user.email
   );
@@ -79,14 +77,19 @@ const Profile = ({ navigation, route }) => {
     setFollowers(res.data.user.followers);
   };
 
+  const getThisUserBlogs = async () => {
+    const res = await axios.get(`${APIURL}/blog/myblog/${writer._id}`);
+    // console.log(res.data.blog);
+    setMyBlogs(res.data.blog);
+  };
+
   useEffect(() => {
     getThisUser();
+    getThisUserBlogs();
     setTimeout(() => {
       setLoading(false);
     }, 1500);
   }, []);
-
-  // console.log("myBlogs", myBlogs);
 
   return (
     <View style={styles.root}>
